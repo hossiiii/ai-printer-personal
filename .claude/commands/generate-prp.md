@@ -1,5 +1,15 @@
 # Create PRP
 
+YOU MUST DO IN-DEPTH RESEARCH, FOLLOW THE <RESEARCH PROCESS>
+
+<RESEARCH PROCESS>
+
+   - Don't only research one page, and don't use your own webscraping tool - instead scrape many relevant pages from all documentation links mentioned in the initial.md file
+   - Take my tech as sacred truth, for example if I say a model name then research that model name for LLM usage - don't assume from your own knowledge at any point
+   - When I say don't just research one page, I mean do incredibly in-depth research, like to the ponit where it's just absolutely ridiculous how much research you've actually done, then when you creat the PRD document you need to put absolutely everything into that including INCREDIBLY IN DEPTH CODE EXMAPLES so any AI can pick up your PRD and generate WORKING and COMPLETE production ready code.
+
+</RESEARCH PROCESS>
+
 ## Feature file: $ARGUMENTS
 
 Generate a complete PRP for general feature implementation with thorough research. Ensure context is passed to the AI agent to enable self-validation and iterative refinement. Read the feature file first to understand what needs to be created, how the examples provided help, and any other considerations.
@@ -19,12 +29,21 @@ The AI agent only gets the context you are appending to the PRP and training dat
    - Library documentation (include specific URLs)
    - Implementation examples (GitHub/StackOverflow/blogs)
    - Best practices and common pitfalls
+   - Don't only research one page, and don't use your own webscraping tool - instead scrape many relevant pages from all documentation links mentioned in the initial.md file
+   - Take my tech as sacred truth, for example if I say a model name then research that model name for LLM usage - don't assume from your own knowledge at any point
+   - When I say don't just research one page, I mean do incredibly in-depth research, like to the ponit where it's just absolutely ridiculous how much research you've actually done, then when you creat the PRD document you need to put absolutely everything into that including INCREDIBLY IN DEPTH CODE EXMAPLES so any AI can pick up your PRD and generate WORKING and COMPLETE production ready code.
 
 3. **User Clarification** (if needed)
    - Specific patterns to mirror and where to find them?
    - Integration requirements and where to find them?
 
 ## PRP Generation
+
+Generate 3 phases
+
+Phase 1: Skeleton Code with detailed implementation comments on exactly how to implement it
+Phase 2: Full and complete production ready code
+Phase 3: Unit Tests
 
 Using PRPs/templates/prp_base.md as template:
 
