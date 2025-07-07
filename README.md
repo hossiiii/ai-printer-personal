@@ -4,6 +4,12 @@ A comprehensive template for getting started with Context Engineering - the disc
 
 > **Context Engineering is 10x better than prompt engineering and 100x better than vibe coding.**
 
+## 🔗 Links & Resources
+
+- **📺 YouTube Channel**: [Income Stream Surfers](https://www.youtube.com/c/incomestreamsurfers) - Learn advanced AI automation techniques
+- **🏫 AI Automation School**: [Skool Community](https://www.skool.com/iss-ai-automation-school-6342/about) - Join our AI automation community
+- **🌐 SEO Grove**: [Live Website](https://seogrove.ai/) - See advanced AI automation in action (built with different methods)
+
 ## 🚀 Quick Start
 
 ```bash
@@ -294,9 +300,10 @@ examples/
 
 This template demonstrates an advanced PRP creation method using multiple parallel research agents for comprehensive documentation gathering.
 
-### Try the Live Implementation
-- **SEO Grove**: https://seogrove.ai/ - See this context engineering approach in action
-- **YouTube Channel**: https://www.youtube.com/c/incomestreamsurfers - Learn more about the methodology
+### See Advanced AI Automation Examples
+- **SEO Grove**: https://seogrove.ai/ - Example of advanced AI automation (built with different methods)
+- **YouTube Channel**: https://www.youtube.com/c/incomestreamsurfers - Learn more about AI automation methodologies
+- **AI Automation School**: https://www.skool.com/iss-ai-automation-school-6342/about - Join our community
 
 ### Advanced PRP Creation Process
 
