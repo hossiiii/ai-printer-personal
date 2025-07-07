@@ -5,3 +5,5 @@ __pycache__
 .pytest_cache
 dontlookinhere/
 INITIAL.md
+php-agentic-framework/
+logs/

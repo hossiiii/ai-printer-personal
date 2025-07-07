@@ -39,11 +39,10 @@ The AI agent only gets the context you are appending to the PRP and training dat
 
 ## PRP Generation
 
-Generate 3 phases
+Generate 2 Phases
 
 Phase 1: Skeleton Code with detailed implementation comments on exactly how to implement it
-Phase 2: Full and complete production ready code
-Phase 3: Unit Tests
+Phase 2: Full and complete production ready code with every single feature fully implemented
 
 Using PRPs/templates/prp_base.md as template:
 
@@ -74,7 +73,8 @@ uv run pytest tests/ -v
 *** ULTRATHINK ABOUT THE PRP AND PLAN YOUR APPROACH THEN START WRITING THE PRP ***
 
 ## Output
-Save as: `PRPs/{feature-name}.md`
+Save as: `PRPs/{phase-1-feature-name}.md`
+Save as: `PRPs/{phase-2-feature-name}.md`
 
 ## Quality Checklist
 - [ ] All necessary context included

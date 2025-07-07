@@ -4,15 +4,19 @@
 - **Use consistent naming conventions, file structure, and architecture patterns** as described in `PLANNING.md`.
 - **Use Docker commands** whenever executing Python commands, including for unit tests.
 - **Set up Docker** Setup a docker instance for development and be aware of the output of Docker so that you can self improve your code and testing.
-- **Create a homepage** - The first task after setting up the docker environment is to create a homepage for the project. This should be a clean system with var variables, a theme, and should also be mobile friendly. This will include human relay - where we will create a homepage together until I'm happy with the result. You can create any SVGs, animations, anything you deem fit, just ensure that it looks good, clean, modern, and follows the design system.
+- **Stick to OFFICIAL DOCUMENTATION PAGES ONLY** - For all research ONLY use official documentation pages. Use a r.jina scrape on the documentation page given to you in intitial.md and then create a llm.txt from it in your memory, then choose the exact pages that make sense for this project and scrape them using your internal scraping tool.
+- **Ultrathink** - Use Ultrathink capabilities to decide which pages to scrape, what informatoin to put into PRD etc.
+- **Create 2 documents .md files** - Phase 1 and phase 2 - phase 1 is skeleton code, phase 2 is complete production ready code with all features and all necessary frontend and backend implementations to use as a production ready tool.
 - **LLM Models** - Always look for the models page from the documentation links mentioned below and find the model that is mentioned in the initial.md - do not change models, find the exact model name to use in the code.
-- **Always scrape around 30-100 pages in total when doing research**
+- **Always scrape around 30-100 pages in total when doing research** - If a page 404s or does not contain correct content, try to scrape again and find the actual page/content. Put the output of each SUCCESFUL Jina scrape into a new directory with the name of the technology researched, then inside it .md or .txt files of each output
+- **Refer to /research/ directory** - Before implementing any feature that uses something that requires documentation, refer to the relevant directory inside /research/ directory and use the .md files to ensure you're coding with great accuracy, never assume knowledge of a third party API, instead always use the documentation examples which are completely up to date.
 - **Take my tech as sacred truth, for example if I say a model name then research that model name for LLM usage - don't assume from your own knowledge at any point** 
-- **For Maximum efficiency, whenever you need to perform multiple independent operations, such as research, invole all relevant tools simultaneously, rather that sequentially.**
+- **For Maximum efficiency, whenever you need to perform multiple independent operations, such as research, invoke all relevant tools simultaneously, rather that sequentially.**
 
 ### 🧱 Code Structure & Modularity
 - **Never create a file longer than 500 lines of code.** If a file approaches this limit, refactor by splitting it into modules or helper files.
 - **When creating AI prompts do not hardcode examples but make everything dynamic or based off the context of what the prompt is for**
+- **Always refer to the specific Phase document you are on** - If you are on phase 1, use phase-1.md, if you are on phase 2, use phase-2.md, if you are on phase 3, use phase-3.md
 - **Agents should be designed as intelligent human beings** by giving them decision making, ability to do detailed research using Jina, and not just your basic propmts that generate absolute shit. This is absolutely vital.
 - **Organize code into clearly separated modules**, grouped by feature or responsibility.
   For agents this looks like:

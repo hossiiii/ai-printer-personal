@@ -290,7 +290,64 @@ examples/
 - Include project-specific rules
 - Define coding standards
 
+## 🎯 Advanced PRP Method - Multi-Agent Research Approach
+
+This template demonstrates an advanced PRP creation method using multiple parallel research agents for comprehensive documentation gathering.
+
+### Try the Live Implementation
+- **SEO Grove**: https://seogrove.ai/ - See this context engineering approach in action
+- **YouTube Channel**: https://www.youtube.com/c/incomestreamsurfers - Learn more about the methodology
+
+### Advanced PRP Creation Process
+
+#### Prompt 1: Initialize Research Framework
+```
+read my incredibly specific instructions about how to create a prp document then summarise them, also store how to do a jina scrapein order to create a llm.txt in your memory
+
+If a page 404s or does not scrape properly, scrape it again
+
+Do not use Jina to scrape CSS of the design site.
+
+All SEPARATE pages must be stored in /research/[technology]/ directories with individual .md files.
+
+curl
+  "https://r.jina.ai/https://platform.openai.com/docs/" \
+    -H "Authorization: Bearer jina_033257e7cdf14fd3b948578e2d34986bNtfCCkjHt7_j1Bkp5Kx521rDs2Eb"
+```
+
+#### Prompt 2: Generate PRP with Parallel Research
+```
+/generate-prp initial.md
+```
+
+**Wait until it gets to the research phase, then press escape and say:**
+
+```
+can you spin up multiple research agents and do this all at the same time
+```
+
+This approach enables:
+- **Parallel Documentation Scraping**: 6+ agents simultaneously research different technologies
+- **Comprehensive Coverage**: 30-100+ pages of official documentation scraped and organized
+- **Technology-Specific Organization**: Each technology gets its own `/research/[tech]/` directory
+- **Production-Ready PRPs**: Complete implementation blueprints with real-world examples
+
+### Research Directory Structure
+```
+research/
+├── pydantic-ai/      # 22+ documentation pages
+├── openai/           # 20+ API documentation pages  
+├── anthropic/        # 18+ Claude documentation pages
+├── jina/             # 12+ scraping API pages
+├── shopify/          # 18+ GraphQL/REST API pages
+└── seo-apis/         # 24+ Search Console/Ahrefs pages
+```
+
+This multi-agent research approach results in PRPs with 9/10 confidence scores for one-pass implementation success.
+
 ## Resources
 
 - [Claude Code Documentation](https://docs.anthropic.com/en/docs/claude-code)
 - [Context Engineering Best Practices](https://www.philschmid.de/context-engineering)
+- [SEO Grove - Live Implementation](https://seogrove.ai/)
+- [Income Stream Surfers - YouTube Channel](https://www.youtube.com/c/incomestreamsurfers)
