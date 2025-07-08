@@ -16,7 +16,7 @@ Make it so I can easily add another agent by giving me detailed documentation on
 
 The flow should look something like: Orchestrator agent "wakes up" and checks the context of the day (new products? what's been optimized so far today? What needs optimizing or creating now etc.) - then it activates various other agents through CRON jobs, those agents then activate, do their work, and send it back to the orchestrator to check against the context of the store (for example for collections, in order to not generate duplicates)
 
-Agents should be designed as intelligent human beings by giving them decision making, ability to do detailed research using Jina, and not just your basic propmts that generate absolute shit. This is absolutely vital.
+Agents should be designed as intelligent human beings by giving them decision making, ability to do detailed research using Jina, and not just your basic propmts that generate absolute shit. This is absolutely vital. They should not use programmatic solutions to problems - but rather use reasoning and AI decision making to solve all problems.
 
 There should be the following agents:
 

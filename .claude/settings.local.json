@@ -22,7 +22,10 @@
       "Bash(php:*)",
       "WebFetch(domain:ai.pydantic.dev)",
       "WebFetch(domain:platform.openai.com)",
-      "Fetch"
+      "Fetch",
+      "Bash(cp:*)",
+      "Bash(chmod:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }

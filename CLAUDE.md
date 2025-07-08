@@ -1,9 +1,11 @@
 ### 🔄 Project Awareness & Context & Research
+- **Documentation is a source of truth** - Your knowledge is out of date, I will always give you the latest documentation before writing any files that use third party API's - that information was freshsly scraped and you should NOT use your own knowledge, but rather use the documentation as a source of absolute truth.
 - **Always read `PLANNING.md`** at the start of a new conversation to understand the project's architecture, goals, style, and constraints.
 - **Check `TASK.md`** before starting a new task. If the task isn’t listed, add it with a brief description and today's date.
 - **Use consistent naming conventions, file structure, and architecture patterns** as described in `PLANNING.md`.
 - **Use Docker commands** whenever executing Python commands, including for unit tests.
 - **Set up Docker** Setup a docker instance for development and be aware of the output of Docker so that you can self improve your code and testing.
+- **Agents** - Agents should be designed as intelligent human beings by giving them decision making, ability to do detailed research using Jina, and not just your basic propmts that generate absolute shit. This is absolutely vital. They should not use programmatic solutions to problems - but rather use reasoning and AI decision making to solve all problems. Every agent should have at least 5 prompts in an agentic workflow to create truly unique content. Each agent should also have the context of what its previous iterations have made.
 - **Stick to OFFICIAL DOCUMENTATION PAGES ONLY** - For all research ONLY use official documentation pages. Use a r.jina scrape on the documentation page given to you in intitial.md and then create a llm.txt from it in your memory, then choose the exact pages that make sense for this project and scrape them using your internal scraping tool.
 - **Ultrathink** - Use Ultrathink capabilities to decide which pages to scrape, what informatoin to put into PRD etc.
 - **Create 2 documents .md files** - Phase 1 and phase 2 - phase 1 is skeleton code, phase 2 is complete production ready code with all features and all necessary frontend and backend implementations to use as a production ready tool.
