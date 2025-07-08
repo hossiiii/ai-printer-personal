@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/doc-reader-hook.py",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

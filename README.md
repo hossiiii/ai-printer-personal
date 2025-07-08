@@ -12,10 +12,14 @@ A comprehensive template for getting started with Context Engineering - the disc
 
 ## 🚀 Quick Start
 
+**For full setup with automatic documentation hooks:** See [SETUP.md](SETUP.md)
+
+**For basic template usage:**
+
 ```bash
 # 1. Clone this template
-git clone https://github.com/coleam00/Context-Engineering-Intro.git
-cd Context-Engineering-Intro
+git clone https://github.com/IncomeStreamSurfer/context-engineering-intro.git
+cd context-engineering-intro
 
 # 2. Set up your project rules (optional - template provided)
 # Edit CLAUDE.md to add your project-specific guidelines
