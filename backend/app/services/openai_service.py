@@ -8,7 +8,6 @@ import time
 import logging
 from typing import Dict, Any, Optional
 from openai import AsyncOpenAI
-import aiofiles
 from ..config import settings
 from ..models.audio import TranscriptionResponse, DocumentResponse
 
@@ -22,8 +21,8 @@ class OpenAIService:
             raise ValueError("OPENAI_API_KEY not configured")
         
         self.client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY or "mock-key-for-development")
-        self.whisper_model = "whisper-1"
-        self.gpt_model = "gpt-4"
+        self.whisper_model = settings.WHISPER_MODEL
+        self.gpt_model = settings.OPENAI_MODEL
     
     async def transcribe_audio(
         self, 
@@ -50,8 +49,9 @@ class OpenAIService:
         
         try:
             # Create temporary file for OpenAI API
-            async with aiofiles.tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
-                await temp_file.write(audio_data)
+            import os
+            with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_file:
+                temp_file.write(audio_data)
                 temp_path = temp_file.name
             
             # Transcribe using Whisper API
@@ -59,12 +59,10 @@ class OpenAIService:
                 response = await self.client.audio.transcriptions.create(
                     model=self.whisper_model,
                     file=audio_file,
-                    language=language,
-                    response_format="verbose_json"
+                    language=language
                 )
             
             # Clean up temporary file
-            import os
             os.unlink(temp_path)
             
             processing_time = time.time() - start_time
@@ -73,9 +71,9 @@ class OpenAIService:
             
             return TranscriptionResponse(
                 text=response.text,
-                language=response.language or "unknown",
+                language=getattr(response, 'language', 'unknown'),
                 confidence=1.0,  # Whisper doesn't provide confidence scores
-                duration=response.duration or 0.0,
+                duration=getattr(response, 'duration', 0.0),
                 processing_time=processing_time
             )
             

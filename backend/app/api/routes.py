@@ -62,6 +62,8 @@ async def transcribe_audio(
         TranscriptionResponse with transcribed text and metadata
     """
     try:
+        logger.info(f"Received transcription request: filename={file.filename}, content_type={file.content_type}")
+        
         # Validate file
         validate_audio_file(file)
         

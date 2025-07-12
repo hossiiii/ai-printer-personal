@@ -10,10 +10,9 @@ services:
     volumes:
       - ./backend:/app
       - /app/.venv
+    env_file:
+      - .env.development
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
-      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
       - DEVELOPMENT=true
       - FRONTEND_URL=http://localhost:3000
       - BACKEND_URL=http://localhost:8000
@@ -35,9 +34,10 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
+    env_file:
+      - .env.development
     environment:
       - REACT_APP_API_URL=http://localhost:8000
-      - REACT_APP_GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - CHOKIDAR_USEPOLLING=true
     command: npm start
     depends_on:

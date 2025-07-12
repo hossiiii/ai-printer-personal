@@ -46,7 +46,7 @@ export class AudioAPI {
     language?: string
   ): Promise<TranscriptionResponse> {
     const formData = new FormData();
-    formData.append('audio', audioBlob, 'recording.wav');
+    formData.append('file', audioBlob, 'recording.webm');
     
     if (language) {
       formData.append('language', language);

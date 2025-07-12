@@ -1,0 +1,76 @@
+{
+  "short_name": "AI Printer",
+  "name": "AI Printer - Voice to Document",
+  "description": "Transform your voice recordings into professional documents",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#2C3E50",
+  "background_color": "#F8F9FA",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["productivity", "business", "utilities"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Quick Record",
+      "short_name": "Record",
+      "description": "Start a new voice recording",
+      "url": "/?action=record",
+      "icons": [
+        {
+          "src": "icons/record-icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Document History",
+      "short_name": "History",
+      "description": "View your document history",
+      "url": "/history",
+      "icons": [
+        {
+          "src": "icons/history-icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "screenshots/desktop-main.png",
+      "type": "image/png",
+      "sizes": "1280x720",
+      "form_factor": "wide",
+      "label": "Main interface on desktop"
+    },
+    {
+      "src": "screenshots/mobile-recording.png",
+      "type": "image/png",
+      "sizes": "375x812",
+      "form_factor": "narrow",
+      "label": "Voice recording on mobile"
+    }
+  ]
+}

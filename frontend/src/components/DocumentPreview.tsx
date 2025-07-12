@@ -111,13 +111,35 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
 
   // Download PDF (development mode)
   const downloadPDF = () => {
-    if (pdfResult?.file_path) {
-      const link = document.createElement('a');
-      link.href = `/api/download/${pdfResult.filename}`;
-      link.download = pdfResult.filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    if (!pdfResult?.filename) {
+      console.warn('No PDF file available for download');
+      return;
+    }
+
+    try {
+      const downloadUrl = `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/download/${pdfResult.filename}`;
+      
+      // Check if we're in a browser environment
+      if (typeof document !== 'undefined' && document.createElement) {
+        // Create download link
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = pdfResult.filename;
+        link.style.display = 'none';
+        
+        // Append to body, click, and remove
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        // Fallback to window.open
+        window.open(downloadUrl, '_blank');
+      }
+    } catch (error) {
+      console.error('Download failed:', error);
+      // Fallback to window.open
+      const downloadUrl = `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/download/${pdfResult.filename}`;
+      window.open(downloadUrl, '_blank');
     }
   };
 

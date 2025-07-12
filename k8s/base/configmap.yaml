@@ -1,0 +1,175 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ai-printer-config
+  namespace: ai-printer
+data:
+  # Application Configuration
+  PROJECT_NAME: "AI Printer"
+  VERSION: "2.0.0"
+  DEVELOPMENT: "false"
+  LOG_LEVEL: "INFO"
+  
+  # API URLs
+  FRONTEND_URL: "https://ai-printer.com"
+  BACKEND_URL: "https://api.ai-printer.com"
+  
+  # Database Configuration
+  DB_HOST: "postgres-service"
+  DB_PORT: "5432"
+  DB_NAME: "ai_printer_db"
+  DB_USER: "ai_printer"
+  
+  # Redis Configuration
+  REDIS_URL: "redis://redis-service:6379/0"
+  
+  # Celery Configuration
+  CELERY_BROKER_URL: "redis://redis-service:6379/0"
+  CELERY_RESULT_BACKEND: "redis://redis-service:6379/0"
+  
+  # OpenAI Configuration
+  OPENAI_MODEL: "gpt-4"
+  WHISPER_MODEL: "whisper-1"
+  
+  # Google OAuth Configuration
+  GOOGLE_REDIRECT_URI: "https://api.ai-printer.com/auth/google/callback"
+  
+  # File Upload Configuration
+  MAX_AUDIO_FILE_SIZE: "26214400"  # 25MB
+  UPLOAD_DIR: "/app/uploads"
+  PDF_OUTPUT_DIR: "/app/documents"
+  
+  # Security Configuration
+  ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+  REFRESH_TOKEN_EXPIRE_DAYS: "7"
+  
+  # Rate Limiting
+  RATE_LIMIT_PER_MINUTE: "60"
+  RATE_LIMIT_PER_HOUR: "1000"
+  
+  # Monitoring
+  PROMETHEUS_ENABLED: "true"
+  PROMETHEUS_PORT: "9090"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: ai-printer
+data:
+  nginx.conf: |
+    events {
+        worker_connections 1024;
+    }
+    
+    http {
+        include /etc/nginx/mime.types;
+        default_type application/octet-stream;
+        
+        # Logging
+        log_format main '$remote_addr - $remote_user [$time_local] "$request" '
+                       '$status $body_bytes_sent "$http_referer" '
+                       '"$http_user_agent" "$http_x_forwarded_for"';
+        
+        access_log /var/log/nginx/access.log main;
+        error_log /var/log/nginx/error.log warn;
+        
+        # Gzip compression
+        gzip on;
+        gzip_vary on;
+        gzip_min_length 1024;
+        gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+        
+        # Rate limiting
+        limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
+        limit_req_zone $binary_remote_addr zone=upload:10m rate=2r/s;
+        
+        # Upstream servers
+        upstream backend {
+            server backend-service:8000;
+        }
+        
+        upstream frontend {
+            server frontend-service:80;
+        }
+        
+        server {
+            listen 80;
+            server_name ai-printer.com www.ai-printer.com;
+            return 301 https://$server_name$request_uri;
+        }
+        
+        server {
+            listen 443 ssl http2;
+            server_name ai-printer.com www.ai-printer.com;
+            
+            # SSL Configuration
+            ssl_certificate /etc/nginx/ssl/tls.crt;
+            ssl_certificate_key /etc/nginx/ssl/tls.key;
+            ssl_protocols TLSv1.2 TLSv1.3;
+            ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384;
+            ssl_prefer_server_ciphers off;
+            
+            # Security headers
+            add_header X-Frame-Options DENY;
+            add_header X-Content-Type-Options nosniff;
+            add_header X-XSS-Protection "1; mode=block";
+            add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+            
+            # API routes
+            location /api/ {
+                limit_req zone=api burst=20 nodelay;
+                
+                proxy_pass http://backend;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                
+                # Increase timeouts for file uploads
+                proxy_connect_timeout 300s;
+                proxy_send_timeout 300s;
+                proxy_read_timeout 300s;
+                client_max_body_size 100M;
+            }
+            
+            # Upload endpoint with special rate limiting
+            location /api/transcribe {
+                limit_req zone=upload burst=5 nodelay;
+                
+                proxy_pass http://backend;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+                
+                client_max_body_size 100M;
+                proxy_connect_timeout 300s;
+                proxy_send_timeout 300s;
+                proxy_read_timeout 300s;
+            }
+            
+            # Health check
+            location /health {
+                proxy_pass http://backend/health;
+                access_log off;
+            }
+            
+            # Frontend routes
+            location / {
+                proxy_pass http://frontend;
+                proxy_set_header Host $host;
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Forwarded-Proto $scheme;
+            }
+            
+            # Static files with caching
+            location /static/ {
+                proxy_pass http://frontend;
+                expires 1y;
+                add_header Cache-Control "public, immutable";
+            }
+        }
+    }

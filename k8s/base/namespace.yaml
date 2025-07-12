@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ai-printer
+  labels:
+    app: ai-printer
+    environment: production
+    version: v2.0.0
+  annotations:
+    description: "AI Printer production namespace"
+    contact: "admin@ai-printer.com"
