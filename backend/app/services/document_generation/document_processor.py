@@ -93,7 +93,7 @@ class AdvancedDocumentProcessor:
             return final_result
             
         except Exception as e:
-            logger.error(f"Document generation failed: {e}")
+            logger.error(f"文書生成が失敗しました: {e}")
             raise
     
     async def _analyze_transcription(
@@ -104,31 +104,31 @@ class AdvancedDocumentProcessor:
         """Analyze transcription to extract key information"""
         
         analysis_prompt = f"""
-        Analyze the following transcription and extract key information for generating a {document_type.value}.
+        以下の文字起こしを分析して、{document_type.value}の生成に必要な重要な情報を抽出してください。
         
-        Transcription:
+        文字起こし:
         {transcription}
         
-        Please extract:
-        1. Main topics and themes
-        2. Key participants (if mentioned)
-        3. Important dates and times
-        4. Action items or decisions
-        5. Contact information
-        6. Tone and formality level
-        7. Document structure suggestions
+        以下の項目を抽出してください：
+        1. 主要なトピックとテーマ
+        2. 主要な参加者（言及されている場合）
+        3. 重要な日付と時間
+        4. アクションアイテムや決定事項
+        5. 連絡先情報
+        6. 文書のトーンと形式レベル
+        7. 文書構造の提案
         
-        Return the analysis in JSON format with the following structure:
+        以下の構造でJSON形式で分析結果を返してください（すべて日本語で）：
         {{
-            "main_topics": ["topic1", "topic2"],
-            "participants": ["person1", "person2"],
-            "dates_times": ["date1", "time1"],
-            "action_items": ["action1", "action2"],
-            "contact_info": ["email", "phone"],
+            "main_topics": ["トピック1", "トピック2"],
+            "participants": ["参加者1", "参加者2"],
+            "dates_times": ["日付1", "時間1"],
+            "action_items": ["アクション1", "アクション2"],
+            "contact_info": ["メール", "電話"],
             "tone": "formal/casual/professional",
-            "structure_suggestions": ["section1", "section2"],
-            "key_points": ["point1", "point2"],
-            "document_title_suggestions": ["title1", "title2"]
+            "structure_suggestions": ["セクション1", "セクション2"],
+            "key_points": ["ポイント1", "ポイント2"],
+            "document_title_suggestions": ["タイトル1", "タイトル2"]
         }}
         """
         
@@ -146,7 +146,7 @@ class AdvancedDocumentProcessor:
             return analysis
             
         except Exception as e:
-            logger.warning(f"Analysis failed, using basic extraction: {e}")
+            logger.warning(f"分析が失敗しました、基本的な抽出を使用します: {e}")
             # Fallback to simple extraction
             return {
                 "main_topics": self._extract_topics_simple(transcription),
@@ -155,9 +155,9 @@ class AdvancedDocumentProcessor:
                 "action_items": [],
                 "contact_info": [],
                 "tone": "professional",
-                "structure_suggestions": ["Introduction", "Main Content", "Conclusion"],
+                "structure_suggestions": ["はじめに", "メインコンテンツ", "まとめ"],
                 "key_points": [transcription[:200] + "..."],
-                "document_title_suggestions": [f"{document_type.value.title()} Document"]
+                "document_title_suggestions": [f"{document_type.value.title()} 文書"]
             }
     
     async def _generate_structured_content(
@@ -176,34 +176,34 @@ class AdvancedDocumentProcessor:
         generation_prompt = f"""
         {base_prompt}
         
-        Source transcription:
+        元の文字起こし:
         {request.transcription_text}
         
-        Analysis results:
+        分析結果:
         {analysis}
         
-        Style requirements:
+        スタイル要件:
         {style_instructions}
         
-        Generate a well-structured {request.document_type.value} with:
-        1. Appropriate formatting
-        2. Clear sections and headers
-        3. Professional language
-        4. All key information included
-        5. Proper document structure for the type
+        以下の要素を含む、よく構造化された{request.document_type.value}を生成してください：
+        1. 適切なフォーマット
+        2. 明確なセクションとヘッダー
+        3. プロフェッショナルな日本語
+        4. すべての重要な情報を含める
+        5. 文書タイプに適した構造
         
-        Return the result in JSON format with:
+        以下のJSON形式で結果を返してください（すべて日本語で）：
         {{
-            "title": "Document title",
+            "title": "文書タイトル",
             "sections": [
                 {{
-                    "heading": "Section heading",
-                    "content": "Section content"
+                    "heading": "セクション見出し",
+                    "content": "セクション内容"
                 }}
             ],
             "metadata": {{
                 "word_count": 123,
-                "estimated_reading_time": "2 minutes",
+                "estimated_reading_time": "2分",
                 "formality_level": "professional"
             }},
             "template_variables": {{
@@ -225,25 +225,25 @@ class AdvancedDocumentProcessor:
             return structured_content
             
         except Exception as e:
-            logger.error(f"Structured content generation failed: {e}")
+            logger.error(f"構造化コンテンツの生成が失敗しました: {e}")
             # Return basic structure
             return {
-                "title": f"{request.document_type.value.title()} Document",
+                "title": f"{request.document_type.value.title()} 文書",
                 "sections": [
                     {
-                        "heading": "Content",
+                        "heading": "内容",
                         "content": request.transcription_text
                     }
                 ],
                 "metadata": {
                     "word_count": len(request.transcription_text.split()),
-                    "estimated_reading_time": f"{max(1, len(request.transcription_text.split()) // 200)} minutes",
+                    "estimated_reading_time": f"{max(1, len(request.transcription_text.split()) // 200)}分",
                     "formality_level": "professional"
                 },
                 "template_variables": {
-                    "title": f"{request.document_type.value.title()} Document",
+                    "title": f"{request.document_type.value.title()} 文書",
                     "content": request.transcription_text,
-                    "date": datetime.now().strftime("%B %d, %Y")
+                    "date": datetime.now().strftime("%Y年%m月%d日")
                 }
             }
     
@@ -284,7 +284,7 @@ class AdvancedDocumentProcessor:
             return formatted_content
             
         except Exception as e:
-            logger.warning(f"Template application failed, using basic formatting: {e}")
+            logger.warning(f"テンプレートの適用が失敗しました、基本的なフォーマットを使用します: {e}")
             # Fallback to basic formatting
             return self._format_basic_document(structured_content)
     
@@ -330,17 +330,17 @@ class AdvancedDocumentProcessor:
         
         if request.target_length:
             length_map = {
-                "short": "Keep it concise and to the point",
-                "medium": "Provide moderate detail and explanation",
-                "long": "Include comprehensive details and explanations"
+                "short": "簡潔で要点を絞った内容にしてください",
+                "medium": "適度な詳細と説明を提供してください",
+                "long": "包括的な詳細と説明を含めてください"
             }
             instructions.append(length_map.get(request.target_length, ""))
         
         if request.formality_level:
             formality_map = {
-                "casual": "Use conversational, friendly language",
-                "formal": "Use formal, traditional business language",
-                "professional": "Use professional, clear, and direct language"
+                "casual": "会話的で親しみやすい日本語を使用してください",
+                "formal": "正式で伝統的なビジネス日本語を使用してください",
+                "professional": "プロフェッショナルで明確かつ直接的な日本語を使用してください"
             }
             instructions.append(formality_map.get(request.formality_level, ""))
         
@@ -348,7 +348,7 @@ class AdvancedDocumentProcessor:
             for key, value in request.style_preferences.items():
                 instructions.append(f"{key}: {value}")
         
-        return "; ".join(instructions) if instructions else "Use clear, professional language"
+        return "；".join(instructions) if instructions else "明確でプロフェッショナルな日本語を使用してください"
     
     def _format_basic_document(self, structured_content: Dict[str, Any]) -> str:
         """Format document using basic formatting when template fails"""
@@ -444,87 +444,87 @@ class AdvancedDocumentProcessor:
         # Analyze word count
         word_count = len(formatted_content.split())
         if word_count < 50:
-            suggestions.append("Consider adding more detail to make the document more comprehensive")
+            suggestions.append("文書をより包括的にするために詳細を追加することを検討してください")
         elif word_count > 2000:
-            suggestions.append("Consider condensing the content for better readability")
+            suggestions.append("読みやすさを向上させるためにコンテンツの簡潔化を検討してください")
         
         # Check structure
         sections = structured_content.get("sections", [])
         if len(sections) < 2:
-            suggestions.append("Add more sections to improve document structure")
+            suggestions.append("文書構造を改善するためにセクションを追加してください")
         
         # Check for specific document type requirements
         if request.document_type == DocumentType.MEETING_MINUTES:
-            if not any("action" in s.get("heading", "").lower() for s in sections):
-                suggestions.append("Consider adding an action items section")
+            if not any("アクション" in s.get("heading", "").lower() or "行動" in s.get("heading", "").lower() for s in sections):
+                suggestions.append("アクションアイテムのセクションを追加することを検討してください")
         
         elif request.document_type == DocumentType.LETTER:
-            if not any("dear" in formatted_content.lower() or "hello" in formatted_content.lower()):
-                suggestions.append("Consider adding a proper salutation")
+            if not any("拝啓" in formatted_content or "いつもお世話" in formatted_content or "平素より" in formatted_content):
+                suggestions.append("適切な挨拶文を追加することを検討してください")
         
         return suggestions
     
     # Document type specific prompts
     def _get_meeting_minutes_prompt(self) -> str:
         return """
-        Generate professional meeting minutes that include:
-        - Meeting title, date, and attendees
-        - Agenda items discussed
-        - Key decisions made
-        - Action items with assigned owners
-        - Next steps and follow-up dates
-        Use clear, concise language appropriate for business documentation.
+        以下を含むプロフェッショナルな議事録を生成してください：
+        - 会議タイトル、日付、参加者
+        - 議論されたアジェンダ項目
+        - 決定された重要事項
+        - 担当者が割り当てられたアクションアイテム
+        - 次のステップとフォローアップ日程
+        ビジネス文書に適した明確で簡潔な日本語を使用してください。
         """
     
     def _get_letter_prompt(self) -> str:
         return """
-        Generate a formal letter that includes:
-        - Proper header with sender and recipient information
-        - Appropriate salutation
-        - Clear, well-structured body paragraphs
-        - Professional closing
-        - Signature line
-        Maintain appropriate formality and business etiquette.
+        以下を含む正式な手紙を生成してください：
+        - 送信者と受信者の情報を含む適切なヘッダー
+        - 適切な挨拶
+        - 明確で構造化された本文段落
+        - プロフェッショナルな結び
+        - 署名欄
+        適切な敬語とビジネスマナーを維持してください。
         """
     
     def _get_report_prompt(self) -> str:
         return """
-        Generate a comprehensive report that includes:
-        - Executive summary
-        - Clear sections with descriptive headings
-        - Data and findings presentation
-        - Analysis and insights
-        - Conclusions and recommendations
-        Use professional language and logical structure.
+        以下を含む包括的な報告書を生成してください：
+        - エグゼクティブサマリー
+        - 説明的な見出しを持つ明確なセクション
+        - データと調査結果の提示
+        - 分析と洞察
+        - 結論と提案
+        プロフェッショナルな日本語と論理的な構造を使用してください。
         """
     
     def _get_announcement_prompt(self) -> str:
         return """
-        Generate a clear announcement that includes:
-        - Attention-grabbing headline
-        - Important details (what, when, where, who)
-        - Clear call to action
-        - Contact information if needed
-        Use engaging but professional language.
+        以下を含む明確なお知らせを生成してください：
+        - 注意を引く見出し
+        - 重要な詳細（何を、いつ、どこで、誰が）
+        - 明確な行動喚起
+        - 必要に応じて連絡先情報
+        魅力的でプロフェッショナルな日本語を使用してください。
         """
     
     def _get_flyer_prompt(self) -> str:
         return """
-        Generate an engaging flyer that includes:
-        - Eye-catching headline
-        - Event or product details
-        - Date, time, and location
-        - Benefits or highlights
-        - Clear call to action
-        - Contact information
-        Use persuasive, engaging language appropriate for marketing.
+        以下を含む魅力的なフライヤーを生成してください：
+        - 目を引く見出し
+        - イベントや製品の詳細
+        - 日付、時間、場所
+        - メリットやハイライト
+        - 明確な行動喚起
+        - 連絡先情報
+        マーケティングに適した説得力のある魅力的な日本語を使用してください。
         """
     
     def _get_custom_prompt(self) -> str:
         return """
-        Generate a well-structured document based on the content provided.
-        Organize information logically with appropriate headings and sections.
-        Use clear, professional language suitable for the intended audience.
+        提供されたコンテンツに基づいて、よく構造化された文書を生成してください。
+        適切な見出しとセクションで情報を論理的に整理してください。
+        対象読者に適した明確でプロフェッショナルな日本語を使用してください。
         """
     
     # Simple extraction methods for fallback
