@@ -25,11 +25,13 @@ import {
   Schedule as TimeIcon,
   Storage as SizeIcon,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 import { DriveAPI, handleAPIError } from '../services/api.ts';
 import { FileHistoryItem } from '../types/index.ts';
 
 const FileHistory: React.FC = () => {
+  const { t } = useTranslation();
   const [files, setFiles] = useState<FileHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
@@ -52,11 +54,11 @@ const FileHistory: React.FC = () => {
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
     if (diffDays === 0) {
-      return `Today at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      return t('fileHistory.today', { time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
     } else if (diffDays === 1) {
-      return `Yesterday at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      return t('fileHistory.yesterday', { time: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) });
     } else if (diffDays < 7) {
-      return `${diffDays} days ago`;
+      return t('fileHistory.daysAgo', { days: diffDays });
     } else {
       return date.toLocaleDateString();
     }
@@ -165,7 +167,7 @@ const FileHistory: React.FC = () => {
       <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
         <CircularProgress size={40} />
         <Typography variant="body1" sx={{ mt: 2 }}>
-          Loading your documents...
+          {t('fileHistory.loading')}
         </Typography>
       </Paper>
     );
@@ -175,7 +177,7 @@ const FileHistory: React.FC = () => {
     <Paper elevation={2} sx={{ p: 3 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <Typography variant="h5">
-          Document History
+          {t('fileHistory.title')}
         </Typography>
         
         <Button
@@ -184,7 +186,7 @@ const FileHistory: React.FC = () => {
           onClick={() => loadFiles(true)}
           disabled={refreshing}
         >
-          {refreshing ? 'Refreshing...' : 'Refresh'}
+          {refreshing ? t('fileHistory.refreshing') : t('fileHistory.refresh')}
         </Button>
       </Box>
 
@@ -196,14 +198,14 @@ const FileHistory: React.FC = () => {
 
       {files.length === 0 && !error ? (
         <Alert severity="info">
-          No documents found. Create your first document by recording audio!
+          {t('fileHistory.noDocuments')}
         </Alert>
       ) : (
         <Box>
           {/* Summary */}
           <Box mb={3}>
             <Typography variant="body2" color="text.secondary">
-              Found {files.length} document{files.length !== 1 ? 's' : ''} in your AI Printer collection
+              {t('fileHistory.foundDocuments', { count: files.length, plural: files.length !== 1 ? 's' : '' })}
             </Typography>
           </Box>
 
@@ -249,7 +251,7 @@ const FileHistory: React.FC = () => {
                     startIcon={<OpenIcon />}
                     onClick={() => openFile(file)}
                   >
-                    Open in Drive
+                    {t('fileHistory.openInDrive')}
                   </Button>
                   
                   {process.env.NODE_ENV === 'development' && (
@@ -258,7 +260,7 @@ const FileHistory: React.FC = () => {
                       startIcon={<DownloadIcon />}
                       onClick={() => downloadFile(file)}
                     >
-                      Download
+                      {t('fileHistory.download')}
                     </Button>
                   )}
                 </CardActions>
@@ -270,8 +272,7 @@ const FileHistory: React.FC = () => {
           {process.env.NODE_ENV === 'development' && (
             <Alert severity="info" sx={{ mt: 3 }}>
               <Typography variant="body2">
-                <strong>Development Mode:</strong> Showing mock data. 
-                In production, this will show your actual Google Drive files.
+                <strong>{t('fileHistory.developmentMode')}</strong> {t('fileHistory.developmentNote')} 
               </Typography>
             </Alert>
           )}

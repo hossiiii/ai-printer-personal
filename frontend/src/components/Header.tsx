@@ -13,10 +13,12 @@ import {
   Home as HomeIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const isHomePage = location.pathname === '/';
 
@@ -25,7 +27,7 @@ const Header: React.FC = () => {
       <Toolbar>
         <PrintIcon sx={{ mr: 2 }} />
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-          AI Printer
+          {t('app.title')}
         </Typography>
         
         <Box sx={{ display: 'flex', gap: 1 }}>
@@ -35,7 +37,7 @@ const Header: React.FC = () => {
               startIcon={<HomeIcon />}
               onClick={() => navigate('/')}
             >
-              Home
+              {t('navigation.home')}
             </Button>
           )}
           
@@ -45,7 +47,7 @@ const Header: React.FC = () => {
               startIcon={<HistoryIcon />}
               onClick={() => navigate('/history')}
             >
-              History
+              {t('navigation.history')}
             </Button>
           )}
         </Box>

@@ -1,0 +1,67 @@
+{
+  "app": {
+    "title": "AI Printer"
+  },
+  "navigation": {
+    "home": "Home",
+    "history": "History"
+  },
+  "voiceRecorder": {
+    "title": "Voice Recording",
+    "recording": "Recording...",
+    "startRecording": "Start Recording",
+    "stopRecording": "Stop Recording",
+    "generateDocument": "Generate Document",
+    "recording_duration": "Recording: {{duration}}",
+    "transcribing": "Transcribing audio...",
+    "generatingDocument": "Generating document...",
+    "transcription": "Transcription:",
+    "errors": {
+      "microphonePermission": "Failed to start recording. Please check microphone permissions.",
+      "noAudio": "No audio recording available"
+    }
+  },
+  "documentPreview": {
+    "title": "Document Preview",
+    "placeholder": "Record audio to generate document preview",
+    "type": "Type: {{type}}",
+    "titleLabel": "Title: {{title}}",
+    "confidence": "Confidence: {{confidence}}%",
+    "viewFullscreen": "View Fullscreen",
+    "reviseTitle": "Revise Document",
+    "revisePlaceholder": "Enter revision instructions (e.g., 'make the title bigger', 'change the date to tomorrow', 'add contact information')",
+    "revise": "Revise",
+    "revising": "Revising...",
+    "generatePDF": "Generate PDF",
+    "generatingPDF": "Generating PDF...",
+    "downloadPDF": "Download PDF",
+    "shareDriveLink": "Share Drive Link",
+    "pdfSuccess": "PDF generated successfully!",
+    "pdfSize": "Size: {{size}} KB",
+    "savedToDrive": "Saved to Google Drive",
+    "fullPreviewTitle": "{{title}} - Full Preview",
+    "close": "Close",
+    "errors": {
+      "noDocument": "No document to convert to PDF",
+      "revisionInstructions": "Please enter revision instructions"
+    }
+  },
+  "fileHistory": {
+    "title": "Document History",
+    "refresh": "Refresh",
+    "refreshing": "Refreshing...",
+    "loading": "Loading your documents...",
+    "noDocuments": "No documents found. Create your first document by recording audio!",
+    "foundDocuments": "Found {{count}} document{{plural}} in your AI Printer collection",
+    "openInDrive": "Open in Drive",
+    "download": "Download",
+    "developmentMode": "Development Mode:",
+    "developmentNote": "Showing mock data. In production, this will show your actual Google Drive files.",
+    "today": "Today at {{time}}",
+    "yesterday": "Yesterday at {{time}}",
+    "daysAgo": "{{days}} days ago"
+  },
+  "alerts": {
+    "driveLinkCopied": "Drive link copied to clipboard!"
+  }
+}
