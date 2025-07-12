@@ -1,53 +1,150 @@
 ## FEATURE:
 
-A full PHP agentic framework using ai.pydantic.dev with gpt 4.1 mini for vision and bulk tasks, and Claude Sonnet 4 as an orchestrator - Make a HTML/CSS/JS frontend and a PHP backend. Use MySQL for database. Use CRON for scheduling.
+Build an AI Printer system - a voice-to-document application for creating flyers and announcements. Users record brief voice instructions (1-2 sentences), and the system uses AI to generate professionally formatted PDF documents.
 
-You should use a system of JSON for decision making, outputting certain information from scraped or otherwise information, interacting with product details, creating content, creating collections, translating to active languages, checking data on search console of pages we've optimised or created, creating blog posts, and finding links. 
+The system should include:
+- Web-based voice recording interface for brief instructions
+- Speech recognition using OpenAI Whisper API (WAV format only)
+- LLM-powered document generation using OpenAI GPT API to determine content and template
+- PDF preview system for user review before final generation
+- Voice-based revision system - users can record additional instructions to modify the document
+- Automatic PDF creation with professional layouts using reportlab
+- Google Drive integration with organized folder structure: /AI-Printer/[Year]/[Month]/[Document-Type]/
+- Simple document generation (no user management)
+- Mobile-responsive design for voice recording on any device
 
-The agents should be extremely intelligent, they can access the internet through Jina as needed. Everything should include competitor analysis that we do, so before making any pages there should be analysis of the SERP using JINA searches.
+Technical Requirements:
+- **Backend**: FastAPI with Python 3.11+, async/await throughout
+- **Frontend**: React with TypeScript, Web Audio API for recording (WAV format)
+- **Storage**: Google Drive API v3 with OAuth2 for user-specific storage
+- **Authentication**: Google OAuth2 for Drive access only
+- **Transcription**: OpenAI Whisper API
+- **Document Generation**: reportlab for PDF creation only
+- **LLM Integration**: OpenAI GPT API for content generation and template selection
+- **Preview System**: HTML/CSS preview before PDF generation
+- **Revision System**: Support multiple voice inputs for document refinement
+- **Audio Processing**: No persistent audio storage - process and discard
+- **Development Environment**: Docker & Docker Compose for local development
+- **Development Mode**: Mock storage for local development, Google Drive for production
 
-There should be a basic access code system, with an admin dashboard where I can generate access codes. This should be secure from SQL injections and anything else you can think of. Once an access code is generated I should be able to give access to the tool to someone. The onboarding should include: Shopify PAT, My Shopify Store URL, Live Store URL, Country of focus (optional), base language (language everything will be optimized into)
+The workflow should be:
 
-Jina has two useful things - s.jina.ai which allows you to scrape search engine results, finding relevant URLs - you can use search operators with an s.jina.ai search, and with r.jina.ai you can turn any webpage into LLM readable markdown including links and images - which is useful for a lot of things for this project. Please implement jina in an intelligent way across the agents. Jina search can also be specified the language and country so use that in an intelligent way. Jina, for example, should be used to create a business description when something like a relevancy check is needed - this allows the relevancy check to check if the content is relevant to the store. This is one example usage of Jina. You will need to use it a lot.
+**Initial Document Creation:**
+1. User clicks "Start Recording" and speaks brief instructions (1-2 sentences)
+2. Real-time audio visualization shows recording progress (WAV format)
+3. User stops recording, audio uploads to backend
+4. Backend converts speech to text using OpenAI Whisper API
+5. Audio file is immediately discarded after transcription
+6. OpenAI GPT API analyzes the instruction and determines:
+   - Document type (flyer, announcement, notice, etc.)
+   - Content structure and layout
+   - Appropriate template selection
+7. System generates HTML/CSS preview of the document
+8. User reviews the preview on screen
 
-The user dashboard should just be a simple way to turn on all agents or individual agents, and then see the results of those actions - as many data points as possible. You can use AI to generate JSON and then display the JSON objects to the user as a handy way to give them information, also you can use a notificaiton system to show them what is happening, as well as a constant feed on each of the separate agent pages on the left to show them what it's doing. Combine agents where needed onto one dashboard page (keep them as separate agents but combine their results - for example the collection agents can be combined - and the product optimizing agent with the product tagger)
+**Revision Process (if needed):**
+9. If user wants changes, they click "Record Revision" 
+10. User speaks revision instructions ("make the title bigger", "change the date", "add contact info")
+11. System processes revision voice input
+12. GPT API applies the changes to the document
+13. Updated preview is displayed
+14. Steps 9-13 repeat until user is satisfied
 
-Make it so I can easily add another agent by giving me detailed documentation on how my agents work and how I can easily prompt you to build another agent by just telling you what I want it to do, and you will always know to add it to the orchestrator's task list.
+**Final Generation:**
+15. User clicks "Generate PDF"
+16. reportlab converts the final design to PDF
+17. Document saves to /AI-Printer/[Year]/[Month]/[Document-Type]/ in Google Drive (prod) or local folder (dev)
+18. User receives download link (dev) or shareable Drive link (prod)
 
-The flow should look something like: Orchestrator agent "wakes up" and checks the context of the day (new products? what's been optimized so far today? What needs optimizing or creating now etc.) - then it activates various other agents through CRON jobs, those agents then activate, do their work, and send it back to the orchestrator to check against the context of the store (for example for collections, in order to not generate duplicates)
+## DEVELOPMENT SETUP:
 
-Agents should be designed as intelligent human beings by giving them decision making, ability to do detailed research using Jina, and not just your basic propmts that generate absolute shit. This is absolutely vital. They should not use programmatic solutions to problems - but rather use reasoning and AI decision making to solve all problems.
+The system should be fully containerized for local development:
 
-There should be the following agents:
+**Docker Compose Services:**
+- **backend**: FastAPI server with hot reload
+- **frontend**: React development server with hot reload
 
-1. Orchestrator agent - Claude Sonnet 4 - should orchestrate the entire process - including quota for the day, assigning tasks to other agents and monitoring progress, as well as ensuring that the other agents don't create spammy content or duplicates by always checking current content on the site vs. the content generated by agents. The orchestrator should be focused specifically on being sticky, so for keeping people for as long as possible - it should take all possible tasks that can be done by our agents according to how many products, images, collections, everything the site has currnetly, and then ensuring the process takes a long time so people stay with the tool for as long as possible, prioritizing both growth for the client but also stickiness for the tool. If a new product is added by the company, as in it's new in our database, we should also then optimize it and instantly tag it with any relevant tags and therefore adding it to collections. We aim for people to stay with us for a year.
-2. Product Optimizing Agent - GPT 4.1 Mini - should optimize product titles according to the SERP, descriptions, meta descriptions, and meta titles.
-3. Product tagging agent - GPT 4.1 Mini - Should tag already existing products on the site with any new collections generated by the collection agent, and should also tag any products that are optimized by the product optimizing agent with new tags, thus generating opportunities for new collections
-4. Collection Agent - GPT 4.1 Mini - Should generate new collections based on the products that are optimized by the product optimizing agent and should also optimize any currently existing collections on the site, based on whether they have less than 3 words in the title, or don't have a description, or have a description that is under 100 characters, it should optimize them. 
-5. Blog Agent - Claude Sonnet 4 - Should generate blog posts based on the products on the website, the collections on the website, and create interesting content that makes sense, which should include internal links to the collection pages as well as embedded product images arranged in product boxes using HTML/CSS/JS - The title will be taken from the admin dashboard, or from the API upload, so start the blog with an H2, make the blogs genuinely interesting, genuinely good looking, using infographics and things using data found online by jina searches and jina scrapes.
-6. Link building agent - claude sonnet 4 for planning, gpt 4.1 mini for scraping - You need to use search operators like "write for us", "submit a guest post" with a couple of words from the niche - and it should then scrape those pages and find information about guest posts then display them back in a friendly way.
-7. Holiday Collection Agent - Claude Sonnet 4 - Should look if there is a holiday coming up in exactly 60 days from today, these holidays should be relevant to the countries that can be inferred from the languages set on the store + the base language of the store, for example if they have Spanish activated it should look in Chile and Spain and all other Spanish speaking countries - then it should use a relevancy check prompt to ensure the holiday has a 80+ relevancy score to that store, and then generate the holiday collection(s) - max 6.
-8. Life Event Collection Agent - Claude Sonnet 4 - Should sometimes (like once a week or something) generate collections based off life events that are relevant to the store - the life events are things like weddings if it's a clothing store, if it's a gift store something like birthdays - that kind of stuff. 
+**Local URLs:**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+- API Documentation: http://localhost:8000/docs
 
+**Environment Variables Setup:**
+```bash
+# .env.development
+OPENAI_API_KEY=your_openai_api_key
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+DEVELOPMENT=true
+FRONTEND_URL=http://localhost:3000
+BACKEND_URL=http://localhost:8000
 
+# .env.production
+OPENAI_API_KEY=your_openai_api_key
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+DEVELOPMENT=false
+FRONTEND_URL=https://your-domain.com
+BACKEND_URL=https://api.your-domain.com
+```
 
+**Development Commands:**
+```bash
+# Start all services
+docker-compose up
+
+# Start with rebuild
+docker-compose up --build
+
+# Run in background
+docker-compose up -d
+
+# View logs
+docker-compose logs -f [service-name]
+
+# Stop all services
+docker-compose down
+
+# Run tests
+docker-compose exec backend pytest
+```
 ## EXAMPLES:
 
-[Provide and explain examples that you have in the `examples/` folder]
+See examples/README.md for code patterns including:
+- Voice upload endpoint with WAV file validation
+- Google Drive integration with /AI-Printer/[Year]/[Month]/[Document-Type]/ folder organization  
+- Document generation with Flyer, Announcement, Notice, Event templates
+- HTML/CSS preview generation for document layouts
+- Voice-based revision processing and document updates
+- Frontend voice recording component patterns (WAV format)
 
-## DOCUMENTATION - You must scrape 10-15 pages at least per link here as documentations NEVER have relevant information on one page.
+## DOCUMENTATION - Research these APIs thoroughly before implementation:
 
-Pydantic AI documentation: https://ai.pydantic.dev/
-Open AI Documentation: https://platform.openai.com/docs/overview
-Anthropic Documentation: https://docs.anthropic.com/en/home
-Reader API Jina: https://jina.ai/reader/ (includes search jina)
-Shopify GraphQL Admin API (preferred): https://shopify.dev/docs/api/admin-graphql
-Shopify Admin APi: https://shopify.dev/docs/api/admin-rest
-Search Console API: https://developers.google.com/webmaster-tools
-Ahrefs API Rapid API: https://rapidapi.com/ayushsomanime/api/ahrefs-dr-rank-checker/playground
-
+OpenAI API Documentation: https://platform.openai.com/docs/overview
+Google Drive API v3: https://developers.google.com/drive/api/v3/about-sdk
+Google OAuth2 Setup: https://developers.google.com/identity/protocols/oauth2
+FastAPI Documentation: https://fastapi.tiangolo.com/
+Web Audio API: https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API
+React Documentation: https://react.dev/
+ReportLab Documentation: https://www.reportlab.com/docs/reportlab-userguide.pdf
 
 ## OTHER CONSIDERATIONS:
+- **Docker Configuration**: Multi-stage builds for production optimization
+- **Environment Variables**: Separate .env files for development and production
+- **Mock Mode**: DEVELOPMENT=true for local file storage, false for Google Drive
+- **Audio Processing**: WAV format only, immediate deletion after transcription
+- **Document Templates**: Flyer, Announcement, Notice, Event templates with professional layouts
+- **Preview System**: Real-time HTML/CSS preview with responsive design
+- **Revision Workflow**: Multi-step voice-based document refinement process
+- **Volume Mounting**: Source code mounting for development hot reload
+- **Network Configuration**: Internal Docker network for service communication
+- **Health Checks**: Container health monitoring and automatic restart
+- **Security**: Validate WAV uploads, implement rate limiting, secure API key management
+- **Accessibility**: Ensure keyboard navigation, screen reader support
+- **Mobile**: Touch-friendly recording interface, responsive design
+- **Error Handling**: Graceful fallbacks for transcription failures, network issues
+- **Privacy**: No audio storage, immediate deletion after processing
+- **Scalability**: Containerized deployment, load balancing ready
+- **Monitoring**: Comprehensive logging, error tracking, usage analytics
 
 Designsystem.md - must be adhered to at all times for building any new features
-Scrape this website for the CSS style I want - do not copy their design system, but use the CSS styles they have https://seogrove.ai/ - This is my website so you can copy most of the content etc.
