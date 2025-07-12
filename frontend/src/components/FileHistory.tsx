@@ -89,7 +89,7 @@ const FileHistory: React.FC = () => {
       setError('');
       
       // For development mode, show mock data since Drive API requires authentication
-      const isDevelopment = process.env.NODE_ENV === 'development';
+      const isDevelopment = import.meta.env.DEV;
       
       if (isDevelopment) {
         // Mock data for development
@@ -143,7 +143,7 @@ const FileHistory: React.FC = () => {
 
   // Download file (development mode only)
   const downloadFile = (file: FileHistoryItem) => {
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       // In development, create a download link to the API endpoint
       const link = document.createElement('a');
       link.href = `/api/download/${file.filename}`;
@@ -254,7 +254,7 @@ const FileHistory: React.FC = () => {
                     {t('fileHistory.openInDrive')}
                   </Button>
                   
-                  {process.env.NODE_ENV === 'development' && (
+                  {import.meta.env.DEV && (
                     <Button
                       size="small"
                       startIcon={<DownloadIcon />}
@@ -269,7 +269,7 @@ const FileHistory: React.FC = () => {
           </Box>
 
           {/* Footer Info */}
-          {process.env.NODE_ENV === 'development' && (
+          {import.meta.env.DEV && (
             <Alert severity="info" sx={{ mt: 3 }}>
               <Typography variant="body2">
                 <strong>{t('fileHistory.developmentMode')}</strong> {t('fileHistory.developmentNote')} 

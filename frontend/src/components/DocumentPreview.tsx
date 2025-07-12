@@ -119,7 +119,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
     }
 
     try {
-      const downloadUrl = `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/download/${pdfResult.filename}`;
+      const downloadUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/download/${pdfResult.filename}`;
       
       // Check if we're in a browser environment
       if (typeof document !== 'undefined' && document.createElement) {
@@ -140,7 +140,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
     } catch (error) {
       console.error('Download failed:', error);
       // Fallback to window.open
-      const downloadUrl = `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/download/${pdfResult.filename}`;
+      const downloadUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/download/${pdfResult.filename}`;
       window.open(downloadUrl, '_blank');
     }
   };

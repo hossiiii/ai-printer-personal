@@ -17,6 +17,8 @@ from reportlab.lib.colors import HexColor
 from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 import html2text
 from bs4 import BeautifulSoup
 
@@ -32,12 +34,63 @@ class PDFService:
         self.output_dir = Path(settings.PDF_OUTPUT_DIR)
         self.output_dir.mkdir(exist_ok=True)
         
+        # Register Japanese fonts
+        self._register_japanese_fonts()
+        
         # Set up default styles
         self.styles = getSampleStyleSheet()
         self._setup_custom_styles()
     
+    def _register_japanese_fonts(self):
+        """Register Japanese fonts for PDF generation"""
+        try:
+            # Try to use system fonts first
+            import subprocess
+            import platform
+            
+            if platform.system() == "Darwin":  # macOS
+                # Try common Japanese fonts on macOS
+                font_paths = [
+                    "/System/Library/Fonts/ヒラギノ角ゴシック W3.otf",
+                    "/System/Library/Fonts/Hiragino Sans GB.ttc",
+                    "/Library/Fonts/Arial Unicode MS.ttf",
+                ]
+            elif platform.system() == "Linux":  # Linux/Docker
+                font_paths = [
+                    "/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf",
+                    "/usr/share/fonts/opentype/ipafont-gothic/ipagp.ttf",
+                    "/usr/share/fonts/opentype/ipafont-mincho/ipam.ttf",
+                    "/usr/share/fonts/opentype/ipafont-mincho/ipamp.ttf",
+                    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+                ]
+            else:  # Windows
+                font_paths = [
+                    "C:/Windows/Fonts/msgothic.ttc",
+                    "C:/Windows/Fonts/msmincho.ttc",
+                ]
+            
+            # Try to register the first available font
+            for font_path in font_paths:
+                if os.path.exists(font_path):
+                    try:
+                        pdfmetrics.registerFont(TTFont('Japanese', font_path))
+                        logger.info(f"Successfully registered Japanese font: {font_path}")
+                        return
+                    except Exception as e:
+                        logger.warning(f"Failed to register font {font_path}: {e}")
+                        continue
+            
+            # Fallback: Use built-in fonts that support some Unicode
+            logger.warning("No Japanese fonts found, falling back to Helvetica")
+            
+        except Exception as e:
+            logger.error(f"Error setting up Japanese fonts: {e}")
+    
     def _setup_custom_styles(self):
         """Set up custom paragraph styles for documents"""
+        
+        # Get font name - use Japanese if available, otherwise fallback
+        font_name = 'Japanese' if 'Japanese' in pdfmetrics.getRegisteredFontNames() else 'Helvetica'
         
         # Title style for flyers/announcements
         self.styles.add(ParagraphStyle(
@@ -46,7 +99,8 @@ class PDFService:
             fontSize=24,
             spaceAfter=30,
             alignment=TA_CENTER,
-            textColor=HexColor('#2C3E50')
+            textColor=HexColor('#2C3E50'),
+            fontName=font_name
         ))
         
         # Subtitle style
@@ -56,7 +110,8 @@ class PDFService:
             fontSize=18,
             spaceAfter=20,
             alignment=TA_CENTER,
-            textColor=HexColor('#34495E')
+            textColor=HexColor('#34495E'),
+            fontName=font_name
         ))
         
         # Body text for announcements
@@ -67,7 +122,8 @@ class PDFService:
             spaceAfter=12,
             alignment=TA_JUSTIFY,
             leftIndent=20,
-            rightIndent=20
+            rightIndent=20,
+            fontName=font_name
         ))
         
         # Event details style
@@ -78,7 +134,8 @@ class PDFService:
             spaceAfter=10,
             alignment=TA_LEFT,
             leftIndent=30,
-            bulletIndent=20
+            bulletIndent=20,
+            fontName=font_name
         ))
         
         # Contact info style
@@ -88,7 +145,8 @@ class PDFService:
             fontSize=10,
             spaceAfter=6,
             alignment=TA_CENTER,
-            textColor=HexColor('#7F8C8D')
+            textColor=HexColor('#7F8C8D'),
+            fontName=font_name
         ))
     
     async def generate_pdf(
@@ -173,62 +231,149 @@ class PDFService:
         Returns:
             Updated story list with PDF content
         """
-        # Add document title
-        title_elem = soup.find(['h1', 'title'])
-        if title_elem:
-            title_text = title_elem.get_text().strip()
-            story.append(Paragraph(title_text, self.styles['FlyerTitle']))
-            story.append(Spacer(1, 0.3*inch))
+        # Get font name - use Japanese if available, otherwise fallback
+        font_name = 'Japanese' if 'Japanese' in pdfmetrics.getRegisteredFontNames() else 'Helvetica'
         
-        # Add subtitle if present
-        subtitle_elem = soup.find('h2')
-        if subtitle_elem:
-            subtitle_text = subtitle_elem.get_text().strip()
-            story.append(Paragraph(subtitle_text, self.styles['FlyerSubtitle']))
-            story.append(Spacer(1, 0.2*inch))
-        
-        # Process main content
-        content_elements = soup.find_all(['p', 'div', 'h3', 'h4', 'ul', 'ol'])
-        
-        for elem in content_elements:
-            if elem.name in ['h3', 'h4']:
+        # Process document in DOM order to maintain structure
+        def process_element(element):
+            """Process a single element and add to story"""
+            if element.name == 'h1':
+                # Main title
+                text = element.get_text().strip()
+                if text:
+                    story.append(Paragraph(text, self.styles['FlyerTitle']))
+                    story.append(Spacer(1, 0.3*inch))
+                    
+            elif element.name == 'h2':
                 # Section headers
-                text = elem.get_text().strip()
+                text = element.get_text().strip()
                 if text:
-                    story.append(Paragraph(text, self.styles['Heading3']))
-                    story.append(Spacer(1, 0.1*inch))
+                    heading_style = ParagraphStyle(
+                        name='SectionHeading',
+                        fontSize=16,
+                        spaceAfter=8,
+                        spaceBefore=12,
+                        textColor=HexColor('#007BFF'),
+                        fontName=font_name,
+                        alignment=TA_LEFT
+                    )
+                    story.append(Paragraph(text, heading_style))
                     
-            elif elem.name == 'p':
+            elif element.name == 'h3':
+                # Subsection headers
+                text = element.get_text().strip()
+                if text:
+                    heading_style = ParagraphStyle(
+                        name='SubsectionHeading',
+                        fontSize=14,
+                        spaceAfter=6,
+                        spaceBefore=10,
+                        textColor=HexColor('#333333'),
+                        fontName=font_name,
+                        alignment=TA_LEFT
+                    )
+                    story.append(Paragraph(text, heading_style))
+                    
+            elif element.name == 'p':
                 # Paragraphs
-                text = elem.get_text().strip()
+                text = element.get_text().strip()
                 if text:
-                    # Choose style based on document type
-                    if document_type in ['announcement', 'notice']:
-                        style = self.styles['AnnouncementBody']
+                    # Check if this is a subtitle (first p after h1)
+                    prev_sibling = element.find_previous_sibling()
+                    if prev_sibling and prev_sibling.name == 'h1':
+                        # This is a subtitle
+                        story.append(Paragraph(text, self.styles['FlyerSubtitle']))
+                        story.append(Spacer(1, 0.2*inch))
                     else:
-                        style = self.styles['Normal']
-                    
-                    story.append(Paragraph(text, style))
-                    story.append(Spacer(1, 0.1*inch))
-                    
-            elif elem.name in ['ul', 'ol']:
-                # Lists
-                for li in elem.find_all('li'):
+                        # Regular paragraph
+                        para_style = ParagraphStyle(
+                            name='BodyParagraph',
+                            fontSize=12,
+                            spaceAfter=8,
+                            spaceBefore=4,
+                            leftIndent=0,
+                            rightIndent=0,
+                            alignment=TA_JUSTIFY,
+                            lineHeight=1.5,
+                            fontName=font_name
+                        )
+                        story.append(Paragraph(text, para_style))
+                        
+            elif element.name == 'ul':
+                # Unordered lists
+                for li in element.find_all('li', recursive=False):
                     text = li.get_text().strip()
                     if text:
-                        bullet_text = f"• {text}" if elem.name == 'ul' else f"1. {text}"
-                        story.append(Paragraph(bullet_text, self.styles['EventDetails']))
+                        bullet_style = ParagraphStyle(
+                            name='BulletPoint',
+                            fontSize=12,
+                            spaceAfter=4,
+                            leftIndent=20,
+                            bulletIndent=10,
+                            fontName=font_name
+                        )
+                        story.append(Paragraph(f"• {text}", bullet_style))
                         
-            elif elem.name == 'div':
-                # Generic content divs
-                text = elem.get_text().strip()
-                if text and len(text) > 10:  # Avoid empty or very short divs
-                    # Check for contact info patterns
-                    if any(keyword in text.lower() for keyword in ['contact', 'phone', 'email', 'address']):
-                        story.append(Paragraph(text, self.styles['ContactInfo']))
-                    else:
-                        story.append(Paragraph(text, self.styles['Normal']))
-                    story.append(Spacer(1, 0.1*inch))
+            elif element.name == 'ol':
+                # Ordered lists
+                for i, li in enumerate(element.find_all('li', recursive=False), 1):
+                    text = li.get_text().strip()
+                    if text:
+                        number_style = ParagraphStyle(
+                            name='NumberedPoint',
+                            fontSize=12,
+                            spaceAfter=4,
+                            leftIndent=20,
+                            bulletIndent=10,
+                            fontName=font_name
+                        )
+                        story.append(Paragraph(f"{i}. {text}", number_style))
+        
+        # Find the main document container
+        document_container = soup.find(['div', 'article', 'main'], class_=['document', 'content']) or soup
+        
+        # Process all elements in DOM order
+        for element in document_container.find_all(['h1', 'h2', 'h3', 'h4', 'p', 'ul', 'ol'], recursive=True):
+            # Skip if element is inside a nested container we'll process separately
+            parent_containers = element.find_parents(['header', 'footer', 'nav', 'aside'])
+            if not parent_containers:
+                process_element(element)
+        
+        # Process header section if present
+        header = soup.find('header')
+        if header:
+            # Header is usually processed above, but handle special cases
+            pass
+            
+        # Process footer section if present
+        footer = soup.find('footer')
+        if footer:
+            story.append(Spacer(1, 0.3*inch))
+            
+            for element in footer.find_all(['h1', 'h2', 'h3', 'h4', 'p'], recursive=True):
+                if element.name in ['h1', 'h2', 'h3']:
+                    text = element.get_text().strip()
+                    if text:
+                        footer_heading_style = ParagraphStyle(
+                            name='FooterHeading',
+                            fontSize=16,
+                            spaceAfter=8,
+                            alignment=TA_CENTER,
+                            textColor=HexColor('#333333'),
+                            fontName=font_name
+                        )
+                        story.append(Paragraph(text, footer_heading_style))
+                elif element.name == 'p':
+                    text = element.get_text().strip()
+                    if text:
+                        footer_para_style = ParagraphStyle(
+                            name='FooterParagraph',
+                            fontSize=12,
+                            spaceAfter=8,
+                            alignment=TA_CENTER,
+                            fontName=font_name
+                        )
+                        story.append(Paragraph(text, footer_para_style))
         
         # Add footer space
         story.append(Spacer(1, 0.5*inch))

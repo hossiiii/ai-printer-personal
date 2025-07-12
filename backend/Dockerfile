@@ -1,9 +1,12 @@
 FROM python:3.11-slim
 
-# Install system dependencies
+# Install system dependencies including Japanese fonts
 RUN apt-get update && apt-get install -y \
     ffmpeg \
     curl \
+    fonts-dejavu-core \
+    fonts-ipafont-gothic \
+    fonts-ipafont-mincho \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
