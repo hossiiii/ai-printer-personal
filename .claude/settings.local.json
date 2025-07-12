@@ -1,22 +1,19 @@
 {
   "permissions": {
     "allow": [
-      "Bash(sed:*)",
-      "Bash(grep:*)",
-      "WebFetch(domain:docs.anthropic.com)",
-      "WebFetch(domain:github.com)",
-      "Bash(claude mcp:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git push:*)",
-      "Bash(gh auth:*)",
-      "Bash(env)",
-      "Bash(GITHUB_TOKEN=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 gh repo view)",
-      "Bash(git remote add:*)",
-      "Bash(git remote set-url:*)",
+      "Bash(*)",
+      "Bash(docker-compose:*)",
+      "Bash(docker build:*)",
+      "Bash(docker run:*)",
+      "Bash(curl:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker stop:*)",
+      "Bash(docker rm:*)",
       "Bash(git checkout:*)",
-      "Bash(GITHUB_TOKEN=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 gh repo edit --default-branch main)",
-      "Bash(git merge:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   }

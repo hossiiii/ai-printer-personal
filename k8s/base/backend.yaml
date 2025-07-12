@@ -1,0 +1,362 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: ai-printer
+  labels:
+    app: backend
+    component: api
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+        component: api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      initContainers:
+      - name: db-migration
+        image: ai-printer/backend:2.0.0
+        command: ["alembic", "upgrade", "head"]
+        env:
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: ai-printer-config
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: ai-printer-config
+              key: DB_PORT
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: ai-printer-config
+              key: DB_NAME
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: ai-printer-config
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: ai-printer-secrets
+              key: DB_PASSWORD
+      containers:
+      - name: backend
+        image: ai-printer/backend:2.0.0
+        ports:
+        - containerPort: 8000
+          name: http
+        envFrom:
+        - configMapRef:
+            name: ai-printer-config
+        - secretRef:
+            name: ai-printer-secrets
+        volumeMounts:
+        - name: uploads
+          mountPath: /app/uploads
+        - name: documents
+          mountPath: /app/documents
+        - name: logs
+          mountPath: /app/logs
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 30
+      volumes:
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: uploads-pvc
+      - name: documents
+        persistentVolumeClaim:
+          claimName: documents-pvc
+      - name: logs
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: ai-printer
+  labels:
+    app: backend
+    component: api
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 8000
+    targetPort: 8000
+    name: http
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: uploads-pvc
+  namespace: ai-printer
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: shared-storage
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: documents-pvc
+  namespace: ai-printer
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: shared-storage
+  resources:
+    requests:
+      storage: 100Gi
+
+---
+# Celery Worker Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-worker
+  namespace: ai-printer
+  labels:
+    app: celery-worker
+    component: worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: celery-worker
+  template:
+    metadata:
+      labels:
+        app: celery-worker
+        component: worker
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9540"
+    spec:
+      containers:
+      - name: celery-worker
+        image: ai-printer/backend:2.0.0
+        command: ["celery", "-A", "app.celery_app.celery", "worker", "--loglevel=info", "--concurrency=4", "--queues=audio_processing,document_generation,google_drive,analytics"]
+        envFrom:
+        - configMapRef:
+            name: ai-printer-config
+        - secretRef:
+            name: ai-printer-secrets
+        volumeMounts:
+        - name: uploads
+          mountPath: /app/uploads
+        - name: documents
+          mountPath: /app/documents
+        - name: logs
+          mountPath: /app/logs
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          exec:
+            command:
+            - celery
+            - -A
+            - app.celery_app.celery
+            - inspect
+            - ping
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+      volumes:
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: uploads-pvc
+      - name: documents
+        persistentVolumeClaim:
+          claimName: documents-pvc
+      - name: logs
+        emptyDir: {}
+
+---
+# Celery Beat Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-beat
+  namespace: ai-printer
+  labels:
+    app: celery-beat
+    component: scheduler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: celery-beat
+  template:
+    metadata:
+      labels:
+        app: celery-beat
+        component: scheduler
+    spec:
+      containers:
+      - name: celery-beat
+        image: ai-printer/backend:2.0.0
+        command: ["celery", "-A", "app.celery_app.celery", "beat", "--loglevel=info"]
+        envFrom:
+        - configMapRef:
+            name: ai-printer-config
+        - secretRef:
+            name: ai-printer-secrets
+        volumeMounts:
+        - name: celery-beat-schedule
+          mountPath: /app/celerybeat-schedule
+        - name: logs
+          mountPath: /app/logs
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+      volumes:
+      - name: celery-beat-schedule
+        persistentVolumeClaim:
+          claimName: celery-beat-pvc
+      - name: logs
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: celery-beat-pvc
+  namespace: ai-printer
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: fast-ssd
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+# Celery Flower Monitoring
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: celery-flower
+  namespace: ai-printer
+  labels:
+    app: celery-flower
+    component: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: celery-flower
+  template:
+    metadata:
+      labels:
+        app: celery-flower
+        component: monitoring
+    spec:
+      containers:
+      - name: celery-flower
+        image: ai-printer/backend:2.0.0
+        command: ["celery", "-A", "app.celery_app.celery", "flower", "--port=5555"]
+        ports:
+        - containerPort: 5555
+          name: flower
+        envFrom:
+        - configMapRef:
+            name: ai-printer-config
+        - secretRef:
+            name: ai-printer-secrets
+        env:
+        - name: FLOWER_BASIC_AUTH
+          value: "$(FLOWER_USER):$(FLOWER_PASSWORD)"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5555
+          initialDelaySeconds: 30
+          periodSeconds: 30
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: celery-flower-service
+  namespace: ai-printer
+  labels:
+    app: celery-flower
+    component: monitoring
+spec:
+  selector:
+    app: celery-flower
+  ports:
+  - port: 5555
+    targetPort: 5555
+    name: flower
+  type: ClusterIP

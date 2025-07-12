@@ -6,4 +6,5 @@ __pycache__
 dontlookinhere/
 INITIAL.md
 php-agentic-framework/
-logs/
+logs/# Important: Never commit API keys or sensitive data to version control
+.env.development
