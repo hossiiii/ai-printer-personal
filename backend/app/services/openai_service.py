@@ -220,46 +220,113 @@ class OpenAIService:
         
         try:
             import json
+            import re
+            
+            # Clean up response content by removing markdown code blocks
+            cleaned_content = response_content.strip()
+            if cleaned_content.startswith('```json'):
+                cleaned_content = re.sub(r'^```json\s*', '', cleaned_content)
+            if cleaned_content.endswith('```'):
+                cleaned_content = re.sub(r'\s*```$', '', cleaned_content)
+            
+            # Fix common JSON escape issues
+            cleaned_content = cleaned_content.replace('\\ ', ' ')  # Fix broken escapes
+            cleaned_content = cleaned_content.replace('\\n', '\\n')  # Fix newlines
+            cleaned_content = cleaned_content.replace('\\"', '"')   # Fix quotes
             
             # Try to parse as JSON first
-            if response_content.strip().startswith('{'):
-                content = json.loads(response_content)
+            if cleaned_content.strip().startswith('{'):
+                content = json.loads(cleaned_content)
+                
+                # Clean up HTML and CSS content
+                html_content = content.get("html", "<div>Content not generated</div>")
+                css_content = content.get("css", ".document { font-family: Arial, sans-serif; }")
+                
+                # Remove ALL unnecessary escaping completely
+                html_content = self._clean_content(html_content)
+                css_content = self._clean_content(css_content)
+                
                 return {
                     "title": content.get("title", "Generated Document"),
-                    "html": content.get("html", "<div>Content not generated</div>"),
-                    "css": content.get("css", ".document { font-family: Arial, sans-serif; }")
+                    "html": html_content,
+                    "css": css_content
                 }
             
             # Fallback: Extract components manually
             return self._extract_components_manually(response_content)
             
+        except json.JSONDecodeError as e:
+            logger.warning(f"JSONデコードエラー: {e}")
+            logger.warning(f"Cleaned content: {cleaned_content[:300]}...")
+            # Use manual extraction as fallback
+            return self._extract_components_manually(response_content)
         except Exception as e:
             logger.warning(f"文書レスポンスの解析に失敗しました: {e}")
+            logger.warning(f"Raw response content: {response_content[:200]}...")
             return {
-                "title": "生成された文書",
-                "html": f"<div class='document'><h1>生成されたコンテンツ</h1><p>{response_content}</p></div>",
+                "title": "生成された文書", 
+                "html": f"<div class='document'><h1>生成されたコンテンツ</h1><p>{response_content[:500]}</p></div>",
                 "css": ".document { font-family: Arial, sans-serif; padding: 20px; }"
             }
     
     def _extract_components_manually(self, content: str) -> Dict[str, str]:
         """Manually extract HTML/CSS components from response"""
+        import re
         
-        # Simple extraction logic - can be enhanced
-        html_start = content.find("<")
-        css_start = content.find("{")
+        # Extract title from JSON-like content
+        title_match = re.search(r'"title":\s*"([^"]+)"', content)
+        title = title_match.group(1) if title_match else "Generated Document"
         
-        if html_start != -1 and css_start != -1:
-            html_part = content[html_start:css_start].strip()
-            css_part = content[css_start:].strip()
+        # Extract HTML from JSON-like content  
+        html_match = re.search(r'"html":\s*"([^"]+(?:\\.[^"]*)*)"', content)
+        if html_match:
+            html_part = self._clean_content(html_match.group(1))
         else:
-            html_part = f"<div class='document'>{content}</div>"
-            css_part = ".document { font-family: Arial, sans-serif; padding: 20px; }"
+            # Fallback: Look for any HTML tags
+            html_start = content.find("<")
+            if html_start != -1:
+                html_end = content.rfind(">") + 1
+                html_part = self._clean_content(content[html_start:html_end])
+            else:
+                html_part = f"<div class='document'><h1>{title}</h1><p>{content[:300]}</p></div>"
+        
+        # Extract CSS from JSON-like content
+        css_match = re.search(r'"css":\s*"([^"]+(?:\\.[^"]*)*)"', content) 
+        if css_match:
+            css_part = self._clean_content(css_match.group(1))
+        else:
+            css_part = ".document { font-family: Arial, sans-serif; padding: 20px; color: #333; }"
         
         return {
-            "title": "Generated Document",
+            "title": title,
             "html": html_part,
             "css": css_part
         }
+    
+    def _clean_content(self, content: str) -> str:
+        """Completely clean up escaped content"""
+        if not content:
+            return content
+        
+        # Remove all types of unnecessary escaping
+        cleaned = content
+        
+        # Fix multiple backslashes
+        cleaned = cleaned.replace('\\\\\\\\', '')  # Remove quadruple backslashes
+        cleaned = cleaned.replace('\\\\\\', '')    # Remove triple backslashes  
+        cleaned = cleaned.replace('\\\\', '')      # Remove double backslashes
+        cleaned = cleaned.replace('\\ ', ' ')      # Remove escaped spaces
+        
+        # Fix quotes and newlines properly
+        cleaned = cleaned.replace('\\"', '"')      # Unescape quotes
+        cleaned = cleaned.replace('\\n', '\n')     # Convert to actual newlines
+        cleaned = cleaned.replace('\\t', '\t')     # Convert to actual tabs
+        
+        # Remove any remaining single backslashes before normal characters
+        import re
+        cleaned = re.sub(r'\\([^\\])', r'\1', cleaned)
+        
+        return cleaned.strip()
 
 # Global service instance
 openai_service = OpenAIService()

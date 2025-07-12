@@ -13,7 +13,22 @@
       "Bash(git add:*)",
       "Bash(git push:*)",
       "Bash(gh pr create:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "mcp__github__list_issues",
+      "mcp__github__search_repositories",
+      "mcp__github__create_repository",
+      "Bash(open https://github.com/hossiiii/ai-printer-personal/issues)",
+      "Bash(claude mcp:*)",
+      "mcp__github__create_issue",
+      "Bash(open https://github.com/hossiiii/ai-printer-personal/issues/new)",
+      "Bash(docker compose:*)",
+      "Bash(lsof:*)",
+      "Bash(docker system prune:*)",
+      "Bash(rm:*)",
+      "Bash(ls:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker cp:*)",
+      "Bash(gh auth:*)"
     ],
     "deny": []
   }

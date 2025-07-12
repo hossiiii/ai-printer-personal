@@ -21,7 +21,7 @@ i18n
     resources,
     fallbackLng: 'ja', // Default to Japanese
     lng: 'ja', // Set Japanese as default language
-    debug: process.env.NODE_ENV === 'development',
+    debug: import.meta.env.DEV,
 
     interpolation: {
       escapeValue: false, // React already does escaping

@@ -11,8 +11,8 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Build for development
+# Expose port
 EXPOSE 3000
 
-# Start development server
-CMD ["npm", "start"]
+# Start Vite development server
+CMD ["npm", "run", "dev"]
