@@ -17,6 +17,7 @@ import {
   Pause as PauseIcon,
   Delete as DeleteIcon,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 import { AudioAPI, DocumentAPI, handleAPIError } from '../services/api.ts';
 import { RecordingState, ProcessingState, DocumentResponse, TranscriptionResponse } from '../types/index.ts';
@@ -30,6 +31,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   onDocumentGenerated,
   onError,
 }) => {
+  const { t } = useTranslation();
   const [recordingState, setRecordingState] = useState<RecordingState>({
     isRecording: false,
     duration: 0,
@@ -106,7 +108,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
       
     } catch (error) {
       console.error('Error starting recording:', error);
-      onError?.('Failed to start recording. Please check microphone permissions.');
+      onError?.(t('voiceRecorder.errors.microphonePermission'));
     }
   };
 
@@ -152,7 +154,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   // Process audio (transcribe and generate document)
   const processAudio = async () => {
     if (!recordingState.audioBlob) {
-      onError?.('No audio recording available');
+      onError?.(t('voiceRecorder.errors.noAudio'));
       return;
     }
 
@@ -218,7 +220,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
   return (
     <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
       <Typography variant="h5" gutterBottom>
-        Voice Recording
+        {t('voiceRecorder.title')}
       </Typography>
       
       <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
@@ -226,7 +228,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         {recordingState.isRecording && (
           <Box textAlign="center">
             <Typography variant="h6" color="error">
-              Recording...
+              {t('voiceRecorder.recording')}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               {formatDuration(recordingState.duration)}
@@ -250,7 +252,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
               color="primary"
               sx={{ minWidth: 140 }}
             >
-              Start Recording
+              {t('voiceRecorder.startRecording')}
             </Button>
           ) : (
             <Button
@@ -261,7 +263,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
               color="error"
               sx={{ minWidth: 140 }}
             >
-              Stop Recording
+              {t('voiceRecorder.stopRecording')}
             </Button>
           )}
         </Box>
@@ -270,7 +272,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         {hasRecording && (
           <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
             <Chip 
-              label={`Recording: ${formatDuration(recordingState.duration)}`}
+              label={t('voiceRecorder.recording_duration', { duration: formatDuration(recordingState.duration) })}
               variant="outlined"
               color="primary"
             />
@@ -300,8 +302,8 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
           <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
             <CircularProgress size={40} />
             <Typography variant="body2">
-              {processingState.isTranscribing && 'Transcribing audio...'}
-              {processingState.isGeneratingDocument && 'Generating document...'}
+              {processingState.isTranscribing && t('voiceRecorder.transcribing')}
+              {processingState.isGeneratingDocument && t('voiceRecorder.generatingDocument')}
             </Typography>
           </Box>
         )}
@@ -310,7 +312,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
         {transcriptionText && (
           <Alert severity="info" sx={{ width: '100%', mt: 2 }}>
             <Typography variant="body2">
-              <strong>Transcription:</strong> {transcriptionText}
+              <strong>{t('voiceRecorder.transcription')}</strong> {transcriptionText}
             </Typography>
           </Alert>
         )}
@@ -324,7 +326,7 @@ const VoiceRecorder: React.FC<VoiceRecorderProps> = ({
             color="secondary"
             sx={{ mt: 2 }}
           >
-            Generate Document
+            {t('voiceRecorder.generateDocument')}
           </Button>
         )}
       </Box>

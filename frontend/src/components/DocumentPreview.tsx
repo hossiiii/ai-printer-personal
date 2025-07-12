@@ -23,6 +23,7 @@ import {
   Share as ShareIcon,
   Fullscreen as FullscreenIcon,
 } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 import { DocumentAPI, handleAPIError } from '../services/api.ts';
 import { DocumentResponse, TranscriptionResponse, PDFGenerationResponse } from '../types/index.ts';
@@ -40,6 +41,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   onDocumentUpdated,
   onError,
 }) => {
+  const { t } = useTranslation();
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [isRevising, setIsRevising] = useState(false);
   const [revisionText, setRevisionText] = useState('');
@@ -51,7 +53,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   // Generate PDF from current document
   const generatePDF = async () => {
     if (!document) {
-      onError?.('No document to convert to PDF');
+      onError?.(t('documentPreview.errors.noDocument'));
       return;
     }
 
@@ -79,7 +81,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
   // Revise document based on text input
   const reviseDocument = async () => {
     if (!document || !revisionText.trim()) {
-      onError?.('Please enter revision instructions');
+      onError?.(t('documentPreview.errors.revisionInstructions'));
       return;
     }
 
@@ -148,7 +150,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
     if (pdfResult?.drive_link) {
       navigator.clipboard.writeText(pdfResult.drive_link);
       // Could show a snackbar here
-      alert('Drive link copied to clipboard!');
+      alert(t('alerts.driveLinkCopied'));
     }
   };
 
@@ -161,7 +163,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
     return (
       <Paper elevation={2} sx={{ p: 3, textAlign: 'center' }}>
         <Typography variant="h6" color="text.secondary">
-          Record audio to generate document preview
+          {t('documentPreview.placeholder')}
         </Typography>
       </Paper>
     );
@@ -172,11 +174,11 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
       <Paper elevation={2} sx={{ p: 3 }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
           <Typography variant="h5">
-            Document Preview
+            {t('documentPreview.title')}
           </Typography>
           
           <Box display="flex" gap={1}>
-            <Tooltip title="View Fullscreen">
+            <Tooltip title={t('documentPreview.viewFullscreen')}>
               <IconButton onClick={openFullscreen}>
                 <FullscreenIcon />
               </IconButton>
@@ -187,17 +189,17 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
         {/* Document Info */}
         <Box display="flex" gap={1} mb={2} flexWrap="wrap">
           <Chip 
-            label={`Type: ${document.document_type}`}
+            label={t('documentPreview.type', { type: document.document_type })}
             variant="outlined"
             color="primary"
           />
           <Chip 
-            label={`Title: ${document.title}`}
+            label={t('documentPreview.titleLabel', { title: document.title })}
             variant="outlined"
           />
           {transcription && (
             <Chip 
-              label={`Confidence: ${Math.round(transcription.confidence * 100)}%`}
+              label={t('documentPreview.confidence', { confidence: Math.round(transcription.confidence * 100) })}
               variant="outlined"
               color={transcription.confidence > 0.8 ? 'success' : 'warning'}
             />
@@ -230,7 +232,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
         {/* Revision Section */}
         <Box mb={3}>
           <Typography variant="h6" gutterBottom>
-            Revise Document
+            {t('documentPreview.reviseTitle')}
           </Typography>
           
           <Box display="flex" gap={2} alignItems="flex-start">
@@ -238,7 +240,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
               fullWidth
               multiline
               rows={2}
-              placeholder="Enter revision instructions (e.g., 'make the title bigger', 'change the date to tomorrow', 'add contact information')"
+              placeholder={t('documentPreview.revisePlaceholder')}
               value={revisionText}
               onChange={(e) => setRevisionText(e.target.value)}
               disabled={isRevising}
@@ -251,7 +253,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
               disabled={isRevising || !revisionText.trim()}
               sx={{ minWidth: 120 }}
             >
-              {isRevising ? 'Revising...' : 'Revise'}
+              {isRevising ? t('documentPreview.revising') : t('documentPreview.revise')}
             </Button>
           </Box>
         </Box>
@@ -266,7 +268,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
             disabled={isGeneratingPDF}
             color="secondary"
           >
-            {isGeneratingPDF ? 'Generating PDF...' : 'Generate PDF'}
+            {isGeneratingPDF ? t('documentPreview.generatingPDF') : t('documentPreview.generatePDF')}
           </Button>
 
           {pdfResult && (
@@ -277,7 +279,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
                   startIcon={<DownloadIcon />}
                   onClick={downloadPDF}
                 >
-                  Download PDF
+                  {t('documentPreview.downloadPDF')}
                 </Button>
               )}
               
@@ -287,7 +289,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
                   startIcon={<ShareIcon />}
                   onClick={shareDriveLink}
                 >
-                  Share Drive Link
+                  {t('documentPreview.shareDriveLink')}
                 </Button>
               )}
             </>
@@ -298,9 +300,9 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
         {pdfResult && (
           <Alert severity="success" sx={{ mt: 2 }}>
             <Typography variant="body2">
-              PDF generated successfully! 
-              {pdfResult.file_size && ` Size: ${(pdfResult.file_size / 1024).toFixed(1)} KB`}
-              {pdfResult.drive_link && ` | Saved to Google Drive`}
+              {t('documentPreview.pdfSuccess')} 
+              {pdfResult.file_size && ` ${t('documentPreview.pdfSize', { size: (pdfResult.file_size / 1024).toFixed(1) })}`}
+              {pdfResult.drive_link && ` | ${t('documentPreview.savedToDrive')}`}
             </Typography>
           </Alert>
         )}
@@ -319,7 +321,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
         <DialogTitle>
           <Box display="flex" justifyContent="space-between" alignItems="center">
             <Typography variant="h6">
-              {document.title} - Full Preview
+              {t('documentPreview.fullPreviewTitle', { title: document.title })}
             </Typography>
             <Chip label={document.document_type} color="primary" />
           </Box>
@@ -348,7 +350,7 @@ const DocumentPreview: React.FC<DocumentPreviewProps> = ({
         
         <DialogActions>
           <Button onClick={() => setFullscreenOpen(false)}>
-            Close
+            {t('documentPreview.close')}
           </Button>
         </DialogActions>
       </Dialog>
