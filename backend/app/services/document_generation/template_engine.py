@@ -302,109 +302,585 @@ class AdvancedTemplateEngine:
                 'syntax_errors': [str(e)]
             }
     
+    def get_japanese_template_styles(self) -> Dict[str, str]:
+        """Get CSS styles optimized for Japanese documents"""
+        return {
+            'japanese_professional': '''
+                <style>
+                body {
+                    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic Medium", "Meiryo", "MS Gothic", sans-serif;
+                    font-size: 14px;
+                    line-height: 1.8;
+                    color: #1e293b;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    padding: 40px 32px;
+                    background: white;
+                }
+                
+                h1 {
+                    font-size: 24px;
+                    font-weight: 600;
+                    color: #1e293b;
+                    text-align: center;
+                    margin-bottom: 32px;
+                    padding-bottom: 16px;
+                    border-bottom: 2px solid #22c55e;
+                }
+                
+                h2 {
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #334155;
+                    margin: 32px 0 16px 0;
+                    padding: 8px 16px;
+                    background: linear-gradient(90deg, #f8f9fa, transparent);
+                    border-left: 4px solid #22c55e;
+                }
+                
+                h3 {
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #475569;
+                    margin: 24px 0 12px 0;
+                }
+                
+                p {
+                    margin: 16px 0;
+                    text-align: justify;
+                }
+                
+                .date-header {
+                    text-align: right;
+                    font-size: 14px;
+                    color: #64748b;
+                    margin-bottom: 24px;
+                }
+                
+                .sender-info, .recipient-info {
+                    margin: 24px 0;
+                    padding: 16px;
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                }
+                
+                .highlight {
+                    background: linear-gradient(transparent 60%, rgba(34, 197, 94, 0.3) 60%);
+                    padding: 2px 4px;
+                }
+                
+                ul, ol {
+                    margin: 16px 0;
+                    padding-left: 24px;
+                }
+                
+                li {
+                    margin: 8px 0;
+                }
+                
+                .action-item {
+                    background: #f1f5f9;
+                    padding: 12px;
+                    margin: 8px 0;
+                    border-radius: 6px;
+                    border-left: 3px solid #3b82f6;
+                }
+                
+                .footer {
+                    margin-top: 48px;
+                    text-align: center;
+                    font-size: 12px;
+                    color: #94a3b8;
+                    border-top: 1px solid #e2e8f0;
+                    padding-top: 16px;
+                }
+                
+                @media print {
+                    body { padding: 20px; }
+                    h1 { border-bottom: 1px solid #000; }
+                    .action-item { border: 1px solid #ccc; }
+                }
+                </style>
+            ''',
+            
+            'japanese_modern': '''
+                <style>
+                body {
+                    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic Medium", "Meiryo", sans-serif;
+                    font-size: 14px;
+                    line-height: 1.7;
+                    color: #1e293b;
+                    max-width: 750px;
+                    margin: 0 auto;
+                    padding: 48px 40px;
+                    background: linear-gradient(135deg, #fafafa 0%, #ffffff 100%);
+                }
+                
+                h1 {
+                    font-size: 28px;
+                    font-weight: 700;
+                    color: #0f172a;
+                    text-align: center;
+                    margin-bottom: 40px;
+                    position: relative;
+                }
+                
+                h1:after {
+                    content: '';
+                    position: absolute;
+                    bottom: -12px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 80px;
+                    height: 3px;
+                    background: linear-gradient(90deg, #22c55e, #ef2b70);
+                    border-radius: 2px;
+                }
+                
+                h2 {
+                    font-size: 20px;
+                    font-weight: 600;
+                    color: #1e293b;
+                    margin: 36px 0 20px 0;
+                    padding: 12px 20px;
+                    background: white;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                    border-left: 4px solid #22c55e;
+                }
+                
+                h3 {
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #334155;
+                    margin: 28px 0 16px 0;
+                }
+                
+                p {
+                    margin: 18px 0;
+                    text-align: justify;
+                }
+                
+                .card {
+                    background: white;
+                    padding: 24px;
+                    margin: 20px 0;
+                    border-radius: 12px;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+                    border: 1px solid #e2e8f0;
+                }
+                
+                .date-badge {
+                    display: inline-block;
+                    background: linear-gradient(135deg, #22c55e, #16a34a);
+                    color: white;
+                    padding: 8px 16px;
+                    border-radius: 20px;
+                    font-size: 13px;
+                    font-weight: 500;
+                    margin-bottom: 20px;
+                }
+                
+                .attendees {
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 8px;
+                    margin: 16px 0;
+                }
+                
+                .attendee-tag {
+                    background: #f1f5f9;
+                    color: #475569;
+                    padding: 6px 12px;
+                    border-radius: 16px;
+                    font-size: 13px;
+                    border: 1px solid #cbd5e1;
+                }
+                
+                .action-grid {
+                    display: grid;
+                    gap: 16px;
+                    margin: 24px 0;
+                }
+                
+                .action-card {
+                    background: #fafafa;
+                    padding: 16px;
+                    border-radius: 8px;
+                    border-left: 4px solid #3b82f6;
+                    position: relative;
+                }
+                
+                .action-card:before {
+                    content: '📝';
+                    position: absolute;
+                    right: 16px;
+                    top: 16px;
+                    font-size: 18px;
+                }
+                
+                @media (max-width: 768px) {
+                    body { padding: 24px 20px; }
+                    .attendees { flex-direction: column; }
+                }
+                </style>
+            ''',
+            
+            'japanese_formal': '''
+                <style>
+                body {
+                    font-family: "MS Mincho", "Yu Mincho", "Hiragino Mincho ProN", serif;
+                    font-size: 14px;
+                    line-height: 1.9;
+                    color: #1a1a1a;
+                    max-width: 700px;
+                    margin: 0 auto;
+                    padding: 60px 48px;
+                    background: white;
+                }
+                
+                h1 {
+                    font-size: 22px;
+                    font-weight: 600;
+                    color: #1a1a1a;
+                    text-align: center;
+                    margin-bottom: 48px;
+                    padding: 20px 0;
+                    border: 2px solid #1a1a1a;
+                    position: relative;
+                }
+                
+                h1:before, h1:after {
+                    content: '';
+                    position: absolute;
+                    width: 30px;
+                    height: 30px;
+                    border: 2px solid #1a1a1a;
+                }
+                
+                h1:before {
+                    top: -2px;
+                    left: -2px;
+                    border-right: none;
+                    border-bottom: none;
+                }
+                
+                h1:after {
+                    bottom: -2px;
+                    right: -2px;
+                    border-left: none;
+                    border-top: none;
+                }
+                
+                h2 {
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #1a1a1a;
+                    margin: 40px 0 20px 0;
+                    text-align: center;
+                    padding-bottom: 8px;
+                    border-bottom: 1px solid #666;
+                }
+                
+                h3 {
+                    font-size: 16px;
+                    font-weight: 600;
+                    color: #333;
+                    margin: 32px 0 16px 0;
+                    text-decoration: underline;
+                }
+                
+                p {
+                    margin: 20px 0;
+                    text-align: justify;
+                    text-indent: 1em;
+                }
+                
+                .date-line {
+                    text-align: right;
+                    font-size: 14px;
+                    margin-bottom: 40px;
+                    padding-right: 20px;
+                }
+                
+                .formal-address {
+                    margin: 30px 0;
+                    padding: 20px;
+                    border: 1px solid #ccc;
+                    text-align: center;
+                    background: #fafafa;
+                }
+                
+                .closing-section {
+                    margin-top: 60px;
+                    text-align: right;
+                    padding-right: 40px;
+                }
+                
+                .signature-line {
+                    margin-top: 40px;
+                    border-bottom: 1px solid #333;
+                    width: 200px;
+                    margin-left: auto;
+                    padding-bottom: 20px;
+                }
+                
+                ul, ol {
+                    margin: 20px 0;
+                    padding-left: 40px;
+                }
+                
+                li {
+                    margin: 12px 0;
+                }
+                
+                .item-box {
+                    border: 1px solid #ccc;
+                    padding: 16px;
+                    margin: 16px 0;
+                    background: #f9f9f9;
+                }
+                
+                @media print {
+                    body { 
+                        padding: 40px;
+                        font-size: 12px;
+                    }
+                }
+                </style>
+            '''
+        }
+    
     async def get_template_suggestions(
         self, 
         document_type: DocumentType,
-        content_hints: List[str] = None
+        content_hints: List[str] = None,
+        style_preference: str = "japanese_professional"
     ) -> Dict[str, Any]:
-        """Get template suggestions based on document type and content"""
+        """Get template suggestions based on document type and content with Japanese styling"""
+        
+        styles = self.get_japanese_template_styles()
+        selected_style = styles.get(style_preference, styles['japanese_professional'])
         
         suggestions = {
             DocumentType.MEETING_MINUTES: {
                 'structure': [
-                    'Meeting title and date',
-                    'Attendees list',
-                    'Agenda items',
-                    'Discussion points',
-                    'Action items with owners',
-                    'Next meeting date'
+                    '会議タイトルと日時',
+                    '出席者リスト',
+                    '議題項目',
+                    '討議内容',
+                    '決定事項とアクション項目',
+                    '次回会議予定'
                 ],
                 'variables': [
                     'meeting_title', 'meeting_date', 'attendees',
                     'agenda_items', 'discussion_points', 'action_items',
                     'next_meeting_date', 'meeting_organizer'
                 ],
-                'sample_template': '''# {{ meeting_title }}
-**Date:** {{ format_date(meeting_date) }}
-**Attendees:** {{ attendees | join(", ") }}
+                'sample_template': f'''{selected_style}
+<div class="date-header">{{ format_date(meeting_date, "%Y年%m月%d日") }}</div>
 
-## Agenda
+<h1>{{ meeting_title }}</h1>
+
+<div class="card">
+<h2>📋 会議概要</h2>
+<p><strong>主催者：</strong>{{ meeting_organizer }}</p>
+<div class="attendees">
+{% for attendee in attendees %}
+<span class="attendee-tag">{{ attendee }}</span>
+{% endfor %}
+</div>
+</div>
+
+<h2>📝 議題</h2>
+<ol>
 {% for item in agenda_items %}
-- {{ item }}
+<li>{{ item }}</li>
 {% endfor %}
+</ol>
 
-## Discussion Points
-{{ discussion_points }}
+<h2>💬 討議内容</h2>
+{{ discussion_points | markdown }}
 
-## Action Items
+<h2>✅ アクション項目</h2>
+<div class="action-grid">
 {% for action in action_items %}
-- [ ] {{ action.task }} ({{ action.owner }})
+<div class="action-card">
+<strong>{{ action.task }}</strong><br>
+担当者: {{ action.owner }}<br>
+期限: {{ format_date(action.due_date, "%m月%d日") if action.due_date else "未定" }}
+</div>
 {% endfor %}
+</div>
 
-**Next Meeting:** {{ format_date(next_meeting_date) }}'''
+<div class="footer">
+次回会議: {{ format_date(next_meeting_date, "%Y年%m月%d日") if next_meeting_date else "未定" }}
+</div>'''
             },
             
             DocumentType.LETTER: {
                 'structure': [
-                    'Sender information',
-                    'Date',
-                    'Recipient information',
-                    'Salutation',
-                    'Body paragraphs',
-                    'Closing',
-                    'Signature'
+                    '差出人情報',
+                    '日付',
+                    '宛先情報',
+                    '件名',
+                    '本文',
+                    '結び',
+                    '署名'
                 ],
                 'variables': [
-                    'sender_name', 'sender_address', 'recipient_name',
-                    'recipient_address', 'date', 'subject', 'body',
-                    'closing', 'signature'
+                    'sender_name', 'sender_title', 'sender_company', 'sender_address',
+                    'recipient_name', 'recipient_title', 'recipient_company', 'recipient_address',
+                    'date', 'subject', 'body', 'closing', 'signature'
                 ],
-                'sample_template': '''{{ sender_name }}
+                'sample_template': f'''{selected_style}
+<div class="date-line">{{ format_date(date, "%Y年%m月%d日") }}</div>
+
+<div class="formal-address">
+{{ recipient_company }}<br>
+{{ recipient_title }} {{ recipient_name }} 様
+</div>
+
+<h1>{{ subject }}</h1>
+
+<p>拝啓　時下ますますご清栄のこととお慶び申し上げます。</p>
+
+{{ body | markdown }}
+
+<p>何かご不明な点がございましたら、お気軽にお問い合わせください。</p>
+
+<p>今後ともよろしくお願い申し上げます。</p>
+
+<div class="closing-section">
+<p>敬具</p>
+
+<div style="margin-top: 40px;">
+{{ sender_company }}<br>
+{{ sender_title }}<br>
+<strong>{{ sender_name }}</strong>
+</div>
+
+{% if sender_address %}
+<div style="margin-top: 20px; font-size: 12px; color: #666;">
 {{ sender_address }}
+</div>
+{% endif %}
+</div>'''
+            },
+            
+            DocumentType.REPORT: {
+                'structure': [
+                    'レポートタイトル',
+                    '作成日時・作成者',
+                    '概要',
+                    '詳細内容',
+                    '結論・提案',
+                    '添付資料'
+                ],
+                'variables': [
+                    'report_title', 'author', 'date', 'summary',
+                    'content_sections', 'conclusions', 'recommendations',
+                    'attachments'
+                ],
+                'sample_template': f'''{selected_style}
+<div class="date-badge">{{ format_date(date, "%Y年%m月%d日") }}</div>
 
-{{ format_date(date) }}
+<h1>{{ report_title }}</h1>
 
-{{ recipient_name }}
-{{ recipient_address }}
+<div class="card">
+<h2>📊 概要</h2>
+<p><strong>作成者：</strong>{{ author }}</p>
+<p><strong>作成日：</strong>{{ format_date(date, "%Y年%m月%d日") }}</p>
+{{ summary | markdown }}
+</div>
 
-Dear {{ recipient_name }},
+<h2>📋 詳細内容</h2>
+{% for section in content_sections %}
+<div class="card">
+<h3>{{ section.title }}</h3>
+{{ section.content | markdown }}
+</div>
+{% endfor %}
 
-{{ body }}
+<h2>💡 結論・提案</h2>
+<div class="card">
+{{ conclusions | markdown }}
 
-{{ closing }},
+{% if recommendations %}
+<h3>推奨事項</h3>
+<ul>
+{% for rec in recommendations %}
+<li class="highlight">{{ rec }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+</div>
 
-{{ signature }}'''
+{% if attachments %}
+<div class="footer">
+<strong>添付資料：</strong>{{ attachments | join(", ") }}
+</div>
+{% endif %}'''
             },
             
             DocumentType.FLYER: {
                 'structure': [
-                    'Eye-catching headline',
-                    'Event details',
-                    'Location and time',
-                    'Contact information',
-                    'Call to action'
+                    'キャッチフレーズ',
+                    'イベント詳細',
+                    '日時・場所',
+                    '連絡先情報',
+                    '行動喚起'
                 ],
                 'variables': [
                     'headline', 'event_name', 'event_date', 'event_time',
-                    'location', 'description', 'contact_info', 'call_to_action'
+                    'location', 'description', 'contact_info', 'call_to_action',
+                    'organizer', 'ticket_info'
                 ],
-                'sample_template': '''# {{ headline }}
+                'sample_template': f'''{selected_style}
+<h1 style="font-size: 32px; color: #22c55e; text-shadow: 2px 2px 4px rgba(0,0,0,0.1);">
+{{ headline }}
+</h1>
 
-## {{ event_name }}
+<div class="card" style="text-align: center; background: linear-gradient(135deg, #f8f9fa, #e2e8f0);">
+<h2 style="font-size: 24px; margin-bottom: 24px;">{{ event_name }}</h2>
 
-**When:** {{ format_date(event_date) }} at {{ event_time }}
-**Where:** {{ location }}
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0;">
+<div>
+<h3>📅 日時</h3>
+<p><strong>{{ format_date(event_date, "%Y年%m月%d日") }}</strong></p>
+<p>{{ event_time }}</p>
+</div>
+<div>
+<h3>📍 場所</h3>
+<p>{{ location }}</p>
+</div>
+</div>
+</div>
 
-{{ description }}
+<div class="card">
+{{ description | markdown }}
+</div>
 
-{{ contact_info }}
+{% if ticket_info %}
+<div class="card" style="background: #fef3c7; border-left-color: #f59e0b;">
+<h3>🎫 参加方法</h3>
+{{ ticket_info | markdown }}
+</div>
+{% endif %}
 
-{{ call_to_action }}'''
+<div class="card" style="background: #dcfce7; border-left-color: #22c55e; text-align: center;">
+<h3 style="color: #15803d;">{{ call_to_action }}</h3>
+</div>
+
+<div class="footer">
+<strong>主催：</strong>{{ organizer }}<br>
+<strong>お問い合わせ：</strong>{{ contact_info }}
+</div>'''
             }
         }
         
         return suggestions.get(document_type, {
-            'structure': ['Title', 'Content', 'Conclusion'],
+            'structure': ['タイトル', '内容', '結論'],
             'variables': ['title', 'content'],
-            'sample_template': '# {{ title }}\n\n{{ content }}'
+            'sample_template': f'{selected_style}<h1>{{ title }}</h1>\n\n{{ content | markdown }}'
         })
