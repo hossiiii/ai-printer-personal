@@ -88,7 +88,7 @@
 #### Voice Processing
 - Support webm, mp3, wav, m4a formats
 - Max file size: 100MB
-- Use OpenAI Whisper API or Google Speech-to-Text
+- Use OpenAI Whisper API
 - Implement WebSocket for real-time transcription
 
 #### Google Drive Integration
