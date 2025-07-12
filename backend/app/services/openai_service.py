@@ -78,8 +78,8 @@ class OpenAIService:
             )
             
         except Exception as e:
-            logger.error(f"Transcription failed: {e}")
-            raise Exception(f"Audio transcription failed: {str(e)}")
+            logger.error(f"音声文字起こしが失敗しました: {e}")
+            raise Exception(f"音声の文字起こしに失敗しました: {str(e)}")
     
     async def generate_document(
         self,
@@ -136,19 +136,19 @@ class OpenAIService:
             )
             
         except Exception as e:
-            logger.error(f"Document generation failed: {e}")
-            raise Exception(f"Document generation failed: {str(e)}")
+            logger.error(f"文書生成が失敗しました: {e}")
+            raise Exception(f"文書の生成に失敗しました: {str(e)}")
     
     async def _analyze_document_type(self, transcription: str) -> str:
         """Analyze transcription to determine document type"""
         
         analysis_prompt = f"""
-        Analyze this transcription and determine what type of document should be created.
-        Choose from: flyer, announcement, notice, event
+        以下の文字起こしを分析して、作成すべき文書の種類を決定してください。
+        選択肢: flyer, announcement, notice, event
         
-        Transcription: "{transcription}"
+        文字起こし: "{transcription}"
         
-        Respond with only the document type.
+        文書の種類のみを返答してください。
         """
         
         try:
@@ -167,22 +167,23 @@ class OpenAIService:
             return doc_type
             
         except Exception as e:
-            logger.warning(f"Document type analysis failed: {e}, using default")
+            logger.warning(f"文書タイプの分析が失敗しました: {e}、デフォルトを使用します")
             return "flyer"
     
     def _build_system_prompt(self, document_type: str) -> str:
         """Build system prompt for document generation"""
         
         base_prompt = """
-        You are a professional document designer creating high-quality printed materials.
-        Generate content that is visually appealing, clear, and effective.
+        あなたは高品質な印刷物を作成するプロフェッショナルな文書デザイナーです。
+        見た目が魅力的で、明確で効果的なコンテンツを生成してください。
+        すべての回答は日本語で行ってください。
         """
         
         type_specific = {
-            "flyer": "Create an eye-catching flyer with clear hierarchy and compelling call-to-action.",
-            "announcement": "Create a formal announcement with important information prominently displayed.",
-            "notice": "Create a clear notice with essential information that's easy to read quickly.",
-            "event": "Create an engaging event invitation with all necessary details."
+            "flyer": "明確な階層構造と説得力のある行動喚起を含む、人目を引くフライヤーを作成してください。",
+            "announcement": "重要な情報を目立つように配置した、正式なお知らせを作成してください。",
+            "notice": "重要な情報を素早く読み取れる、明確な通知を作成してください。",
+            "event": "必要な詳細情報をすべて含む、魅力的なイベント招待状を作成してください。"
         }
         
         return f"{base_prompt}\n\n{type_specific.get(document_type, type_specific['flyer'])}"
@@ -191,24 +192,25 @@ class OpenAIService:
         """Build user prompt for document generation"""
         
         prompt = f"""
-        Create a professional document based on this voice instruction:
+        以下の音声指示に基づいてプロフェッショナルな文書を作成してください：
         "{transcription}"
         
-        {f"Additional instructions: {custom_instructions}" if custom_instructions else ""}
+        {f"追加の指示: {custom_instructions}" if custom_instructions else ""}
         
-        Provide your response in this exact JSON format:
+        以下の正確なJSON形式で回答してください：
         {{
-            "title": "Document title",
-            "html": "<div class='document'>HTML content here</div>",
-            "css": ".document {{ CSS styles here }}"
+            "title": "文書のタイトル",
+            "html": "<div class='document'>HTMLコンテンツをここに</div>",
+            "css": ".document {{ CSSスタイルをここに }}"
         }}
         
-        Requirements:
-        - Professional, modern design
-        - Clear hierarchy and readability
-        - Responsive layout
-        - Include all relevant information from the transcription
-        - Use appropriate fonts, colors, and spacing
+        要件：
+        - プロフェッショナルでモダンなデザイン
+        - 明確な階層構造と読みやすさ
+        - レスポンシブレイアウト
+        - 文字起こしからすべての関連情報を含める
+        - 適切なフォント、色、間隔を使用
+        - すべてのコンテンツを日本語で生成
         """
         
         return prompt
@@ -232,10 +234,10 @@ class OpenAIService:
             return self._extract_components_manually(response_content)
             
         except Exception as e:
-            logger.warning(f"Failed to parse document response: {e}")
+            logger.warning(f"文書レスポンスの解析に失敗しました: {e}")
             return {
-                "title": "Generated Document",
-                "html": f"<div class='document'><h1>Generated Content</h1><p>{response_content}</p></div>",
+                "title": "生成された文書",
+                "html": f"<div class='document'><h1>生成されたコンテンツ</h1><p>{response_content}</p></div>",
                 "css": ".document { font-family: Arial, sans-serif; padding: 20px; }"
             }
     
