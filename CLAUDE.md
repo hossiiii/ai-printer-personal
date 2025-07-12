@@ -1,3 +1,10 @@
+## 🖨️ AI Printer Project - Voice-to-Document System
+
+### Project Overview
+- **Purpose**: Voice-activated document generation system with AI transcription and Google Drive storage
+- **Core Features**: Voice recording, AI transcription, document generation, Google Drive integration
+- **Tech Stack**: FastAPI (Backend), React/Vue (Frontend), Google Drive API, Speech-to-Text API
+
 ### 🔄 Project Awareness & Context & Research
 - **Documentation is a source of truth** - Your knowledge is out of date, I will always give you the latest documentation before writing any files that use third party API's - that information was freshsly scraped and you should NOT use your own knowledge, but rather use the documentation as a source of absolute truth.
 - **Always read `PLANNING.md`** at the start of a new conversation to understand the project's architecture, goals, style, and constraints.
@@ -75,3 +82,28 @@
 ### Design
 
 - Stick to the design system inside designsystem.md Designsystem.md - must be adhered to at all times for building any new features.
+
+### 🎤 AI Printer Specific Requirements
+
+#### Voice Processing
+- Support webm, mp3, wav, m4a formats
+- Max file size: 100MB
+- Use OpenAI Whisper API or Google Speech-to-Text
+- Implement WebSocket for real-time transcription
+
+#### Google Drive Integration
+- Use Google Drive API v3
+- Folder structure: /AI-Printer/[Year]/[Month]/[Document-Type]/
+- Implement OAuth2 for user access
+- Handle rate limiting properly
+
+#### Document Generation
+- Support Meeting Minutes, Letters, Reports templates
+- Export to DOCX, PDF, Markdown
+- Allow transcription editing before generation
+
+#### Frontend Requirements
+- Web Audio API for voice recording
+- Real-time waveform visualization
+- React with TypeScript preferred
+- Mobile-responsive design

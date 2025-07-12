@@ -1,35 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep:*)",
-      "Bash(ls:*)",
-      "Bash(source:*)",
-      "Bash(find:*)",
-      "Bash(mv:*)",
-      "Bash(mkdir:*)",
-      "Bash(tree:*)",
-      "Bash(ruff:*)",
-      "Bash(touch:*)",
-      "Bash(cat:*)",
-      "Bash(ruff check:*)",
-      "Bash(pytest:*)",
-      "Bash(python:*)",
-      "Bash(python -m pytest:*)",
-      "Bash(python3 -m pytest:*)",
-      "WebFetch(domain:docs.anthropic.com)",
-      "WebFetch(domain:jina.ai)",
-      "WebFetch(domain:seogrove.ai)",
-      "Bash(php:*)",
-      "WebFetch(domain:ai.pydantic.dev)",
-      "WebFetch(domain:platform.openai.com)",
-      "Fetch",
-      "Bash(cp:*)",
-      "Bash(chmod:*)",
-      "Bash(git add:*)",
-      "Bash(git reset:*)",
-      "Bash(git restore:*)",
-      "Bash(rm:*)",
-      "Bash(git init:*)"
+      "Bash(sed:*)"
     ],
     "deny": []
   }
